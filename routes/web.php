@@ -12,5 +12,12 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+//     return view('welcome');
+    return view('main');
 });
+// })->middleware('auth.basic');
+// })->middleware('auth.basic.once');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
