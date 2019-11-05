@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
  * |--------------------------------------------------------------------------
@@ -16,19 +17,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Route::get('/test', 'MediaClerk@test');
-
-// Route::middleware('auth:api', 'throttle:60,1')->group(function () {
-//     Route::get('/test', function () {
-//         return 'hi';
-//     });
-// });
-
-// Route::middleware(['auth:api'])->group(function () {
-//     Route::get('test', 'MediaClerk@test');
-// });
-
-Route::get('/demo', 'MediaClerk@test');
-//     Route::get('/demo', function(Request $request){
-//         response(['hi'=>'fucker'])->send();
-//     });
+Route::middleware([
+    'auth:api'
+])->group(function () {
+    Route::prefix('files')->group(function () {
+        Route::get('/', 'API\MediaClerkController@index');
+        Route::post('/upload', 'API\MediaClerkController@store');
+    });
+});

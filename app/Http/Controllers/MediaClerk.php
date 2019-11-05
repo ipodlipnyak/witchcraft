@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MediaClerk extends Controller
 {
@@ -23,11 +24,6 @@ class MediaClerk extends Controller
      */
     public function index()
     {
-        return view('main');
-    }
-    
-    public function test() {
-//         return ['hi' => 'oHayo'];
-        response(['hi'=>'fucker']);
+        return view('main',['api_token' => Auth::user()->api_token]);
     }
 }

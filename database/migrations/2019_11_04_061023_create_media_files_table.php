@@ -19,6 +19,8 @@ class CreateMediaFilesTable extends Migration
             $table->string('name');
             $table->string('path');
             $table->json('meta')->nullable();
+            $table->string('upload_session')->nullable();
+            $table->string('start_offset')->nullable();
             $table->timestamps();
         });
     }

@@ -15,7 +15,6 @@
     @input-file="inputFile"
     @input-filter="inputFilter"
     
-    
     chunk-enabled
     :chunk="chunk"
 
@@ -36,17 +35,27 @@
 const VueUploadComponent = require('vue-upload-component')
 
     export default {
+		props: ['apiToken'],
 	  	data: function () {
 		    return {
 		      files: [],
-		      chunk: {
-		          action: '/upload/chunk',
-		          minSize: 1048576,
-		          maxActive: 3,
-		          maxRetries: 5
-		      }
 		    }
 		},
+		computed: {
+			uploadAction: function () {
+				return '/api/files/upload?api_token=' + this.apiToken;
+			},
+			
+			chunk: function () {
+		          return {
+		        	  action: this.uploadAction,
+			          minSize: 1048576,
+			          maxActive: 3,
+			          maxRetries: 5
+		          };
+			},
+		},
+
 		
 		components: {
 			FileUpload: VueUploadComponent

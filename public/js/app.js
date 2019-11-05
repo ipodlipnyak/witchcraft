@@ -1870,20 +1870,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 var VueUploadComponent = __webpack_require__(/*! vue-upload-component */ "./node_modules/vue-upload-component/dist/vue-upload-component.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['apiToken'],
   data: function data() {
     return {
-      files: [],
-      chunk: {
-        action: '/upload/chunk',
+      files: []
+    };
+  },
+  computed: {
+    uploadAction: function uploadAction() {
+      return '/api/files/upload?api_token=' + this.apiToken;
+    },
+    chunk: function chunk() {
+      return {
+        action: this.uploadAction,
         minSize: 1048576,
         maxActive: 3,
         maxRetries: 5
-      }
-    };
+      };
+    }
   },
   components: {
     FileUpload: VueUploadComponent
