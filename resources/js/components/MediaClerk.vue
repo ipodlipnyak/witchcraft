@@ -3,6 +3,10 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
 
+  <ul>
+    <li v-for="file in files">{{file.name}} - Error: {{file.error}}, Success: {{file.success}}</li>
+  </ul>
+
   <file-upload
     ref="upload"
     v-model="files"
@@ -10,9 +14,17 @@
     put-action="/put.method"
     @input-file="inputFile"
     @input-filter="inputFilter"
+    
+    
+    chunk-enabled
+    :chunk="chunk"
+
   >
   Upload file
   </file-upload>
+
+  <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" type="button">Start upload</button>
+  <button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" type="button">Stop upload</button>
 
             </div>
         </div>
@@ -22,12 +34,17 @@
 <script>
 
 const VueUploadComponent = require('vue-upload-component')
-Vue.component('file-upload', VueUploadComponent)
 
     export default {
 	  	data: function () {
 		    return {
-		      files: []
+		      files: [],
+		      chunk: {
+		          action: '/upload/chunk',
+		          minSize: 1048576,
+		          maxActive: 3,
+		          maxRetries: 5
+		      }
 		    }
 		},
 		
@@ -56,6 +73,7 @@ Vue.component('file-upload', VueUploadComponent)
                 }
               }
             },
+            
             /**
              * Pretreatment
              * @param  Object|undefined   newFile   Read and write
@@ -66,7 +84,7 @@ Vue.component('file-upload', VueUploadComponent)
             inputFilter: function (newFile, oldFile, prevent) {
 				if (newFile && !oldFile) {
                 	// Filter non-image file
-                	if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
+                	if (!/\.(mkv|mp4)$/i.test(newFile.name)) {
                   		return prevent()
                 	}
             	}

@@ -1859,13 +1859,30 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var VueUploadComponent = __webpack_require__(/*! vue-upload-component */ "./node_modules/vue-upload-component/dist/vue-upload-component.js");
 
-Vue.component('file-upload', VueUploadComponent);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      files: []
+      files: [],
+      chunk: {
+        action: '/upload/chunk',
+        minSize: 1048576,
+        maxActive: 3,
+        maxRetries: 5
+      }
     };
   },
   components: {
@@ -1903,7 +1920,7 @@ Vue.component('file-upload', VueUploadComponent);
     inputFilter: function inputFilter(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         // Filter non-image file
-        if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
+        if (!/\.(mkv|mp4)$/i.test(newFile.name)) {
           return prevent();
         }
       } // Create a blob field
@@ -37234,12 +37251,30 @@ var render = function() {
         { staticClass: "col-md-8" },
         [
           _c(
+            "ul",
+            _vm._l(_vm.files, function(file) {
+              return _c("li", [
+                _vm._v(
+                  _vm._s(file.name) +
+                    " - Error: " +
+                    _vm._s(file.error) +
+                    ", Success: " +
+                    _vm._s(file.success)
+                )
+              ])
+            }),
+            0
+          ),
+          _vm._v(" "),
+          _c(
             "file-upload",
             {
               ref: "upload",
               attrs: {
                 "post-action": "/post.method",
-                "put-action": "/put.method"
+                "put-action": "/put.method",
+                "chunk-enabled": "",
+                chunk: _vm.chunk
               },
               on: {
                 "input-file": _vm.inputFile,
@@ -37254,6 +37289,50 @@ var render = function() {
               }
             },
             [_vm._v("\nUpload file\n")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: !_vm.$refs.upload || !_vm.$refs.upload.active,
+                  expression: "!$refs.upload || !$refs.upload.active"
+                }
+              ],
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  $event.preventDefault()
+                  _vm.$refs.upload.active = true
+                }
+              }
+            },
+            [_vm._v("Start upload")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: _vm.$refs.upload && _vm.$refs.upload.active,
+                  expression: "$refs.upload && $refs.upload.active"
+                }
+              ],
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  $event.preventDefault()
+                  _vm.$refs.upload.active = false
+                }
+              }
+            },
+            [_vm._v("Stop upload")]
           )
         ],
         1
@@ -51543,6 +51622,7 @@ Vue.component('media-clerk', __webpack_require__(/*! ./components/MediaClerk.vue
 var app = new Vue({
   el: '#app'
 });
+window.app = app;
 
 /***/ }),
 

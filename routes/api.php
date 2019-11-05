@@ -24,6 +24,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     });
 // });
 
-Route::middleware(['auth:api'])->group(function () {
-    Route::get('/test', 'MediaClerk@test');
-});
+// Route::middleware(['auth:api'])->group(function () {
+//     Route::get('test', 'MediaClerk@test');
+// });
+
+Route::get('/demo', 'MediaClerk@test');
+//     Route::get('/demo', function(Request $request){
+//         response(['hi'=>'fucker'])->send();
+//     });

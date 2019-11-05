@@ -30,3 +30,5 @@ Vue.component('media-clerk', require('./components/MediaClerk.vue').default);
 const app = new Vue({
     el: '#app',
 });
+
+window.app = app;

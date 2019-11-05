@@ -27,6 +27,7 @@ class MediaClerk extends Controller
     }
     
     public function test() {
-        return ['hi' => 'oHayo'];
+//         return ['hi' => 'oHayo'];
+        response(['hi'=>'fucker']);
     }
 }
