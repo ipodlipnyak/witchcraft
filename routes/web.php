@@ -11,13 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-//     return view('welcome');
-    return view('main');
-});
-// })->middleware('auth.basic');
-// })->middleware('auth.basic.once');
+Route::get('/','MediaClerk@index');
 
 Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');
