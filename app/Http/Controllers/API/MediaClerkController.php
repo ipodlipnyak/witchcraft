@@ -33,7 +33,7 @@ class MediaClerkController extends Controller
             case 'start':
                 $result = [
                     'data' => [
-                        'session_id' => Str::random(60),
+                        'session_id' => Str::random(10),
                         'end_offset' => 500000
                     ],
                     'status' => 'success'

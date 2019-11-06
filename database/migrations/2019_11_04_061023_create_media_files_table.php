@@ -18,6 +18,7 @@ class CreateMediaFilesTable extends Migration
             $table->bigInteger('user');
             $table->string('name');
             $table->string('path');
+            $table->string('storage_path');
             $table->json('meta')->nullable();
             $table->string('upload_session')->nullable();
             $table->string('start_offset')->nullable();
