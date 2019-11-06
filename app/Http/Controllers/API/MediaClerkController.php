@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\MediaFiles;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\UploadSessions;
+use Illuminate\Support\Facades\Storage;
 
 class MediaClerkController extends Controller
 {
@@ -31,9 +33,15 @@ class MediaClerkController extends Controller
     {
         switch (request('phase')) {
             case 'start':
+                $upload_session = new UploadSessions();
+                $upload_session->name = request('name');
+                $upload_session->mime_type = request('mime_type');
+                $upload_session->size = request('size');
+                $upload_session->save();
+                
                 $result = [
                     'data' => [
-                        'session_id' => Str::random(10),
+                        'session_id' => $upload_session->id,
                         'end_offset' => 500000
                     ],
                     'status' => 'success'
@@ -42,14 +50,17 @@ class MediaClerkController extends Controller
 
             case 'upload':
                 $file = $request->file('chunk');
-
-                $file = $file->move(storage_path('files/chunks'));
-
+                $storage_path = 'chunks';
+                $disk = 'files';
+                $file = $file->move(Storage::disk($disk)->getAdapter()->getPathPrefix().$storage_path);
+                
                 $file_model = MediaFiles::createFromFile($file);
+                $file_model->storage_path = $storage_path;
+                $file_model->storage_disk = $disk;
                 $file_model->upload_session = request('session_id');
                 $file_model->start_offset = request('start_offset');
                 $file_model->save();
-
+                
                 $result = [
                     'status' => 'success'
                 ];
@@ -64,16 +75,20 @@ class MediaClerkController extends Controller
 
             default:
                 $file = $request->file();
-                $file = $file->move(storage_path('files/media'));
-                MediaFiles::createFromFile($file);
+                $storage_path = 'media';
+                $disk = 'files';
+                $file = $file->move(Storage::disk($disk)->getAdapter()->getPathPrefix().$storage_path);
+                
+                $file_model = MediaFiles::createFromFile($file);
+                $file_model->storage_path = $storage_path;
+                $file_model->storage_disk = $disk;
+                $file_model->save();
                 
                 $result = [
                     'status' => 'success'
                 ];
                 break;
         }
-
-        if (request('phase') == 'start') {}
 
         return response()->json($result);
     }

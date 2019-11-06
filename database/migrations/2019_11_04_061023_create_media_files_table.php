@@ -17,12 +17,14 @@ class CreateMediaFilesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('user');
             $table->string('name');
-            $table->string('path');
-            $table->string('storage_path');
-            $table->json('meta')->nullable();
-            $table->string('upload_session')->nullable();
-            $table->string('start_offset')->nullable();
+            $table->string('storage_path')->nullable();
+            $table->string('storage_disk')->nullable();
+            $table->string('name_to_display')->nullable();
+            $table->bigInteger('upload_session')->unsigned()->nullable();
+            $table->integer('start_offset')->nullable();
             $table->timestamps();
+            
+            $table->foreign('upload_session')->references('id')->on('upload_sessions');
         });
     }
 

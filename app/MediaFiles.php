@@ -8,12 +8,18 @@ use Symfony\Component\HttpFoundation\File\File;
 class MediaFiles extends Model
 {
 
-    static function createFromFile(File $file, $storage_path = 'files')
+    /**
+     * 
+     * @param File $file
+     * @param string $storage_path
+     * @param string $name
+     * @return \App\MediaFiles
+     */
+    static function createFromFile(File $file)
     {
         $file_model = new MediaFiles();
         $file_model->user = Auth::user()->id;
         $file_model->name = $file->getFilename();
-        $file_model->storage_path = $storage_path;
         $file_model->save();
 
         return $file_model;
