@@ -31,6 +31,8 @@ class MediaClerkController extends Controller
      */
     public function store(Request $request)
     {
+        $disk = 'files';
+        
         switch (request('phase')) {
             case 'start':
                 $upload_session = new UploadSessions();
@@ -51,7 +53,6 @@ class MediaClerkController extends Controller
             case 'upload':
                 $file = $request->file('chunk');
                 $storage_path = 'chunks';
-                $disk = 'files';
                 $file = $file->move(Storage::disk($disk)->getAdapter()->getPathPrefix().$storage_path);
                 
                 $file_model = MediaFiles::createFromFile($file);
@@ -76,7 +77,6 @@ class MediaClerkController extends Controller
             default:
                 $file = $request->file();
                 $storage_path = 'media';
-                $disk = 'files';
                 $file = $file->move(Storage::disk($disk)->getAdapter()->getPathPrefix().$storage_path);
                 
                 $file_model = MediaFiles::createFromFile($file);

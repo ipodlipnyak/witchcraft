@@ -14,15 +14,11 @@ $app->make(Kernel::class)->bootstrap();
  * Test entry point. Should delete this entire file on prod
  */
 
-// $result = Str::random(60);
-
-
 
 $upload_session_id = 1;
 $file_model = '';
 
 $chunks_list = MediaFiles::query()->where('upload_session', $upload_session_id)->orderBy('start_offset','ASC')->get();
-// $result = $chunks_list[0]->getFullPath();
 
 $upload_session = UploadSessions::query()->find($upload_session_id);
 $file_name = '';
@@ -34,8 +30,8 @@ $media_storage_full_path = $storage_full_prefix.$media_storage;
 
 
 
-
-$result = Storage::disk($disk)->getAdapter()->getPathPrefix();
+// $result = Storage::disk($disk)->getAdapter()->getPathPrefix();
+$bash_result = [];
 
 /* @var $chunk_model MediaFiles */
 foreach ($chunks_list as $i => $chunk_model) {
@@ -43,8 +39,12 @@ foreach ($chunks_list as $i => $chunk_model) {
         $file_name = $chunk_model->name;
         Storage::disk($disk)->copy("{$chunk_model->storage_path}/{$chunk_model->name}", "$media_storage/$file_name");
     } else {
+//         $cat_cmd = "cat {$media_storage_full_path}/{$file_name} {$chunk_model->getFullPath()} > {$media_storage_full_path}/{$file_name}";
+//         $bash_result[] = exec($cat_cmd);
+        
         $chunk = Storage::disk($disk)->get("{$chunk_model->storage_path}/{$chunk_model->name}");
-        Storage::disk($disk)->append("$media_storage/$file_name", $chunk);
+        file_put_contents("{$media_storage_full_path}/{$file_name}",$chunk, FILE_APPEND | LOCK_EX);
+//         Storage::disk($disk)->put("$media_storage/$file_name", $chunk, [FILE_APPEND]);
     }
 
     if ($i + 1 == count($chunks_list)) {
@@ -60,10 +60,8 @@ foreach ($chunks_list as $i => $chunk_model) {
 
 $result = [
 //     'result_id' => $file_model->id,
+    'bash' => $bash_result,
     'cnt_chunks' => count($chunks_list)
 ];
-// response()->json(User::query()->where('name', 'admin')
-// ->get('email'))
-// ->send();
 
 response()->json($result)->send();

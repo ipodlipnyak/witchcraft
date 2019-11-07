@@ -4,6 +4,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Support\Facades\Storage;
 
 class MediaFiles extends Model
 {
@@ -31,7 +32,7 @@ class MediaFiles extends Model
      */
     public function getFullPath()
     {
-        $storage_path = storage_path($this->storage_path);
-        return "{$storage_path}/{$this->name}";
+        $storage_disk = Storage::disk($this->storage_disk)->getAdapter()->getPathPrefix();
+        return "{$storage_disk}{$this->storage_path}/{$this->name}";
     }
 }
