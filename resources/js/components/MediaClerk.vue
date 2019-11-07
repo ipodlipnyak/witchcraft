@@ -3,9 +3,29 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
 
+  <b-button block squared v-b-toggle.uploaded-files variant="primary">Uploaded files</b-button>
+  <b-collapse id="uploaded-files" class="mt-2">
 
+  <b-table striped hover 
+  		:items="filesUploaded" 
+  		:fields="fields_uploaded"
+		:sort-by.sync="uploaded_sortBy"
+      	:sort-desc.sync="uploaded_sortDesc"
+      	responsive="sm">
 
-  <b-table striped hover :items="files" :fields="fields">
+		<!-- A virtual column -->
+		<template v-slot:cell(upload_session.size)="data">
+			<p v-if="data.item.upload_session">
+				{{ formatBytes(data.item.upload_session.size) }}
+			</p>
+		</template>
+  </b-table>
+
+  </b-collapse>
+
+<hr/>
+
+  <b-table v-if="files.length > 0" striped hover :items="files" :fields="fields_files">
 		<!-- A virtual column -->
 		<template v-slot:cell(size)="data">
 			{{ formatBytes(data.value) }}
@@ -18,6 +38,8 @@
 		</template>
   </b-table>
 
+    <b-button-group size="bg" class="btn-block">
+    
   <file-upload
     ref="upload"
     v-model="files"
@@ -28,13 +50,21 @@
     
     chunk-enabled
     :chunk="chunk"
+    
+    :multiple="true"
+    
+    class="btn btn-primary btn-square"
 
   >
+  <font-awesome-icon icon="plus" :style="{ color: 'white' }"/>
   Upload file
   </file-upload>
-
-  <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" type="button">Start upload</button>
-  <button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" type="button">Stop upload</button>
+    
+      <b-button squared v-if="files.length > 0" v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" variant="success">Start upload</b-button>
+      <b-button squared v-if="files.length > 0" v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" variant="danger">Stop upload</b-button>
+    </b-button-group>
+<!--   <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" type="button" class="btn btn-success">Start upload</button> -->
+<!--   <button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" type="button" class="btn btn-warning">Stop upload</button> -->
 
             </div>
         </div>
@@ -44,7 +74,7 @@
 <script>
 
 import FileUpload from 'vue-upload-component';
-import { TablePlugin, ProgressPlugin } from 'bootstrap-vue';
+import { TablePlugin, ProgressPlugin, CollapsePlugin, ButtonPlugin, ButtonGroupPlugin } from 'bootstrap-vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
@@ -55,13 +85,27 @@ library.add(fas)
 
 Vue.use(TablePlugin)
 Vue.use(ProgressPlugin)
+Vue.use(CollapsePlugin)
+Vue.use(ButtonPlugin)
+Vue.use(ButtonGroupPlugin)
+
+
 
     export default {
 		props: ['apiToken'],
 	  	data: function () {
 		    return {
 		      files: [],
-		      fields: ['name','type','size','progress'],
+		      fields_files: ['name','type','size','progress'],
+		      
+		      filesUploaded: [],
+		      fields_uploaded: [
+		    	  { key: 'name_to_display', label: 'Name', sortable: true },
+		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
+		          { key: 'upload_session.size', label: 'Size', sortable: true },
+		          ],
+		      uploaded_sortBy: 'name_to_display',
+		      uploaded_sortDesc: false,
 		    }
 		},
 		computed: {
@@ -83,14 +127,32 @@ Vue.use(ProgressPlugin)
 		components: {
 			FileUpload,
 			FontAwesomeIcon
-// 			TablePlugin
+		},
+		
+		beforeMount() {
+			//
 		},
 		
         mounted() {
-            console.log('Component mounted.')
+			this.getFiles();
         },
         
         methods: {
+        	
+        	getFiles: function() {
+        		self = this;
+        		// Make a request for a user with a given ID
+        		axios.get('/api/files?api_token=' + this.apiToken)
+        		  .then(function (response) {
+        		    // handle success
+        		    self.filesUploaded = response.data;
+        		  })
+        		  .catch(function (error) {
+        		    // handle error
+        		    console.log(error);
+        		  });
+        	},
+        	
             /**
              * Has changed
              * @param  Object|undefined   newFile   Read only
@@ -146,3 +208,7 @@ Vue.use(ProgressPlugin)
     	}
 	}
 </script>
+
+<style scoped>
+
+</style>

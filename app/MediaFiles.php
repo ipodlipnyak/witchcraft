@@ -35,4 +35,12 @@ class MediaFiles extends Model
         $storage_disk = Storage::disk($this->storage_disk)->getAdapter()->getPathPrefix();
         return "{$storage_disk}{$this->storage_path}/{$this->name}";
     }
+    
+    /**
+     * Get all of the posts for the user.
+     */
+    public function uploadSession()
+    {
+        return $this->hasOne('App\UploadSessions', 'id', 'upload_session');
+    }
 }

@@ -11592,6 +11592,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -11601,12 +11631,31 @@ __webpack_require__.r(__webpack_exports__);
 _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_2__["library"].add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__["fas"]);
 Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["TablePlugin"]);
 Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ProgressPlugin"]);
+Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["CollapsePlugin"]);
+Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonPlugin"]);
+Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['apiToken'],
   data: function data() {
     return {
       files: [],
-      fields: ['name', 'type', 'size', 'progress']
+      fields_files: ['name', 'type', 'size', 'progress'],
+      filesUploaded: [],
+      fields_uploaded: [{
+        key: 'name_to_display',
+        label: 'Name',
+        sortable: true
+      }, {
+        key: 'upload_session.mime_type',
+        label: 'Type',
+        sortable: true
+      }, {
+        key: 'upload_session.size',
+        label: 'Size',
+        sortable: true
+      }],
+      uploaded_sortBy: 'name_to_display',
+      uploaded_sortDesc: false
     };
   },
   computed: {
@@ -11624,13 +11673,26 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ProgressPlugin"]);
   },
   components: {
     FileUpload: vue_upload_component__WEBPACK_IMPORTED_MODULE_0___default.a,
-    FontAwesomeIcon: _fortawesome_vue_fontawesome__WEBPACK_IMPORTED_MODULE_4__["FontAwesomeIcon"] // 			TablePlugin
-
+    FontAwesomeIcon: _fortawesome_vue_fontawesome__WEBPACK_IMPORTED_MODULE_4__["FontAwesomeIcon"]
+  },
+  beforeMount: function beforeMount() {//
   },
   mounted: function mounted() {
-    console.log('Component mounted.');
+    this.getFiles();
   },
   methods: {
+    getFiles: function getFiles() {
+      self = this; // Make a request for a user with a given ID
+
+      axios.get('/api/files?api_token=' + this.apiToken).then(function (response) {
+        // handle success
+        self.filesUploaded = response.data;
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      });
+    },
+
     /**
      * Has changed
      * @param  Object|undefined   newFile   Read only
@@ -75818,10 +75880,10 @@ var e=function(){return(e=Object.assign||function(e){for(var t,r=1,s=arguments.l
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&":
-/*!*************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08& ***!
-  \*************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true&":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true& ***!
+  \*************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -75839,115 +75901,214 @@ var render = function() {
         "div",
         { staticClass: "col-md-8" },
         [
-          _c("b-table", {
-            attrs: {
-              striped: "",
-              hover: "",
-              items: _vm.files,
-              fields: _vm.fields
+          _c(
+            "b-button",
+            {
+              directives: [
+                {
+                  name: "b-toggle",
+                  rawName: "v-b-toggle.uploaded-files",
+                  modifiers: { "uploaded-files": true }
+                }
+              ],
+              attrs: { block: "", squared: "", variant: "primary" }
             },
-            scopedSlots: _vm._u([
-              {
-                key: "cell(size)",
-                fn: function(data) {
-                  return [
-                    _vm._v(
-                      "\n\t\t\t" +
-                        _vm._s(_vm.formatBytes(data.value)) +
-                        "\n\t\t"
-                    )
-                  ]
-                }
-              },
-              {
-                key: "cell(progress)",
-                fn: function(data) {
-                  return [
-                    data.item.success
-                      ? _c("font-awesome-icon", {
-                          style: { color: "green" },
-                          attrs: { icon: "check", size: "lg" }
-                        })
-                      : _c("b-progress", {
-                          attrs: {
-                            value: Number(data.value),
-                            "show-progress": "",
-                            animated: ""
-                          }
-                        })
-                  ]
-                }
-              }
-            ])
-          }),
+            [_vm._v("Uploaded files")]
+          ),
           _vm._v(" "),
           _c(
-            "file-upload",
-            {
-              ref: "upload",
-              attrs: {
-                "post-action": "/post.method",
-                "put-action": "/put.method",
-                "chunk-enabled": "",
-                chunk: _vm.chunk
-              },
-              on: {
-                "input-file": _vm.inputFile,
-                "input-filter": _vm.inputFilter
-              },
-              model: {
-                value: _vm.files,
-                callback: function($$v) {
-                  _vm.files = $$v
+            "b-collapse",
+            { staticClass: "mt-2", attrs: { id: "uploaded-files" } },
+            [
+              _c("b-table", {
+                attrs: {
+                  striped: "",
+                  hover: "",
+                  items: _vm.filesUploaded,
+                  fields: _vm.fields_uploaded,
+                  "sort-by": _vm.uploaded_sortBy,
+                  "sort-desc": _vm.uploaded_sortDesc,
+                  responsive: "sm"
                 },
-                expression: "files"
-              }
-            },
-            [_vm._v("\n  Upload file\n  ")]
+                on: {
+                  "update:sortBy": function($event) {
+                    _vm.uploaded_sortBy = $event
+                  },
+                  "update:sort-by": function($event) {
+                    _vm.uploaded_sortBy = $event
+                  },
+                  "update:sortDesc": function($event) {
+                    _vm.uploaded_sortDesc = $event
+                  },
+                  "update:sort-desc": function($event) {
+                    _vm.uploaded_sortDesc = $event
+                  }
+                },
+                scopedSlots: _vm._u([
+                  {
+                    key: "cell(upload_session.size)",
+                    fn: function(data) {
+                      return [
+                        data.item.upload_session
+                          ? _c("p", [
+                              _vm._v(
+                                "\n\t\t\t\t" +
+                                  _vm._s(
+                                    _vm.formatBytes(
+                                      data.item.upload_session.size
+                                    )
+                                  ) +
+                                  "\n\t\t\t"
+                              )
+                            ])
+                          : _vm._e()
+                      ]
+                    }
+                  }
+                ])
+              })
+            ],
+            1
           ),
           _vm._v(" "),
-          _c(
-            "button",
-            {
-              directives: [
-                {
-                  name: "show",
-                  rawName: "v-show",
-                  value: !_vm.$refs.upload || !_vm.$refs.upload.active,
-                  expression: "!$refs.upload || !$refs.upload.active"
-                }
-              ],
-              attrs: { type: "button" },
-              on: {
-                click: function($event) {
-                  $event.preventDefault()
-                  _vm.$refs.upload.active = true
-                }
-              }
-            },
-            [_vm._v("Start upload")]
-          ),
+          _c("hr"),
+          _vm._v(" "),
+          _vm.files.length > 0
+            ? _c("b-table", {
+                attrs: {
+                  striped: "",
+                  hover: "",
+                  items: _vm.files,
+                  fields: _vm.fields_files
+                },
+                scopedSlots: _vm._u(
+                  [
+                    {
+                      key: "cell(size)",
+                      fn: function(data) {
+                        return [
+                          _vm._v(
+                            "\n\t\t\t" +
+                              _vm._s(_vm.formatBytes(data.value)) +
+                              "\n\t\t"
+                          )
+                        ]
+                      }
+                    },
+                    {
+                      key: "cell(progress)",
+                      fn: function(data) {
+                        return [
+                          data.item.success
+                            ? _c("font-awesome-icon", {
+                                style: { color: "green" },
+                                attrs: { icon: "check", size: "lg" }
+                              })
+                            : _c("b-progress", {
+                                attrs: {
+                                  value: Number(data.value),
+                                  "show-progress": "",
+                                  animated: ""
+                                }
+                              })
+                        ]
+                      }
+                    }
+                  ],
+                  null,
+                  false,
+                  3089857122
+                )
+              })
+            : _vm._e(),
           _vm._v(" "),
           _c(
-            "button",
-            {
-              directives: [
+            "b-button-group",
+            { staticClass: "btn-block", attrs: { size: "bg" } },
+            [
+              _c(
+                "file-upload",
                 {
-                  name: "show",
-                  rawName: "v-show",
-                  value: _vm.$refs.upload && _vm.$refs.upload.active,
-                  expression: "$refs.upload && $refs.upload.active"
-                }
-              ],
-              attrs: { type: "button" },
-              on: {
-                click: function($event) {
-                  $event.preventDefault()
-                  _vm.$refs.upload.active = false
-                }
-              }
-            },
-            [_vm._v("Stop upload")]
+                  ref: "upload",
+                  staticClass: "btn btn-primary btn-square",
+                  attrs: {
+                    "post-action": "/post.method",
+                    "put-action": "/put.method",
+                    "chunk-enabled": "",
+                    chunk: _vm.chunk,
+                    multiple: true
+                  },
+                  on: {
+                    "input-file": _vm.inputFile,
+                    "input-filter": _vm.inputFilter
+                  },
+                  model: {
+                    value: _vm.files,
+                    callback: function($$v) {
+                      _vm.files = $$v
+                    },
+                    expression: "files"
+                  }
+                },
+                [
+                  _c("font-awesome-icon", {
+                    style: { color: "white" },
+                    attrs: { icon: "plus" }
+                  }),
+                  _vm._v("\n  Upload file\n  ")
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _vm.files.length > 0
+                ? _c(
+                    "b-button",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: !_vm.$refs.upload || !_vm.$refs.upload.active,
+                          expression: "!$refs.upload || !$refs.upload.active"
+                        }
+                      ],
+                      attrs: { squared: "", variant: "success" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.$refs.upload.active = true
+                        }
+                      }
+                    },
+                    [_vm._v("Start upload")]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.files.length > 0
+                ? _c(
+                    "b-button",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.$refs.upload && _vm.$refs.upload.active,
+                          expression: "$refs.upload && $refs.upload.active"
+                        }
+                      ],
+                      attrs: { squared: "", variant: "danger" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.$refs.upload.active = false
+                        }
+                      }
+                    },
+                    [_vm._v("Stop upload")]
+                  )
+                : _vm._e()
+            ],
+            1
           )
         ],
         1
@@ -90295,7 +90456,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _MediaClerk_vue_vue_type_template_id_87ccfa08___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MediaClerk.vue?vue&type=template&id=87ccfa08& */ "./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&");
+/* harmony import */ var _MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true& */ "./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true&");
 /* harmony import */ var _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MediaClerk.vue?vue&type=script&lang=js& */ "./resources/js/components/MediaClerk.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
@@ -90307,11 +90468,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _MediaClerk_vue_vue_type_template_id_87ccfa08___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _MediaClerk_vue_vue_type_template_id_87ccfa08___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
-  null,
+  "87ccfa08",
   null
   
 )
@@ -90337,19 +90498,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&":
-/*!*******************************************************************************!*\
-  !*** ./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08& ***!
-  \*******************************************************************************/
+/***/ "./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true& ***!
+  \*******************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MediaClerk_vue_vue_type_template_id_87ccfa08___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./MediaClerk.vue?vue&type=template&id=87ccfa08& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MediaClerk_vue_vue_type_template_id_87ccfa08___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MediaClerk_vue_vue_type_template_id_87ccfa08___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

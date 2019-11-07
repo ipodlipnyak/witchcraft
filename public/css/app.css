@@ -11100,3 +11100,11 @@ a.text-dark:focus {
   }
 }
 
+*:focus {
+  outline: none;
+}
+
+.btn.btn-square {
+  border-radius: 0;
+}
+

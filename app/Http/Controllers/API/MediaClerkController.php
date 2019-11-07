@@ -14,13 +14,13 @@ class MediaClerkController extends Controller
 {
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of the uploaded files
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $result = 'hi';
+        $result = MediaFiles::query()->with('UploadSession')->where('user', Auth::user()->id)->where('start_offset',null)->get();
         return response()->json($result);
     }
 
