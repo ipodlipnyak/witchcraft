@@ -11691,9 +11691,19 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
     this.getFiles();
   },
   methods: {
-    deleteFile: function deleteFile(el) {
+    deleteFile: function deleteFile(id) {
       self = this;
-      console.log(el);
+      axios["delete"]('/api/files/' + id + '?api_token=' + this.apiToken).then(function (response) {
+        // handle success
+        if (response.data.status == 'success') {
+          self.getFiles();
+        } else {
+          console.log(response.data);
+        }
+      })["catch"](function (error) {
+        // handle error
+        console.log(error);
+      });
     },
     getFiles: function getFiles() {
       self = this; // Make a request for a user with a given ID
@@ -75915,20 +75925,22 @@ var render = function() {
         "div",
         { staticClass: "col-md-8" },
         [
-          _c(
-            "b-button",
-            {
-              directives: [
+          _vm.filesUploaded.length > 0
+            ? _c(
+                "b-button",
                 {
-                  name: "b-toggle",
-                  rawName: "v-b-toggle.uploaded-files",
-                  modifiers: { "uploaded-files": true }
-                }
-              ],
-              attrs: { block: "", squared: "", variant: "primary" }
-            },
-            [_vm._v("Uploaded files")]
-          ),
+                  directives: [
+                    {
+                      name: "b-toggle",
+                      rawName: "v-b-toggle.uploaded-files",
+                      modifiers: { "uploaded-files": true }
+                    }
+                  ],
+                  attrs: { block: "", squared: "", variant: "primary" }
+                },
+                [_vm._v("Uploaded files")]
+              )
+            : _vm._e(),
           _vm._v(" "),
           _c(
             "b-collapse",
@@ -76010,7 +76022,7 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          _c("hr"),
+          _vm.filesUploaded.length > 0 ? _c("hr") : _vm._e(),
           _vm._v(" "),
           _vm.files.length > 0
             ? _c("b-table", {

@@ -3,7 +3,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
 
-  <b-button block squared v-b-toggle.uploaded-files variant="primary">Uploaded files</b-button>
+  <b-button v-if="filesUploaded.length > 0" block squared v-b-toggle.uploaded-files variant="primary">Uploaded files</b-button>
   <b-collapse id="uploaded-files" class="mt-2">
 
   <b-table striped hover 
@@ -29,7 +29,7 @@
 
   </b-collapse>
 
-<hr/>
+<hr v-if="filesUploaded.length > 0"/>
 
   <b-table v-if="files.length > 0" striped hover :items="files" :fields="fields_files">
 		<!-- A virtual column -->
@@ -145,9 +145,21 @@ Vue.use(ButtonGroupPlugin)
         },
         
         methods: {
-        	deleteFile: function(el) {
+        	deleteFile: function(id) {
         		self = this;
-        		console.log(el);
+        		axios.delete('/api/files/' + id + '?api_token=' + this.apiToken)
+        		  .then(function (response) {
+        		    // handle success
+        		    if (response.data.status == 'success') {
+        		    	self.getFiles();
+        		    } else {
+        		    	console.log(response.data);
+        		    }
+        		  })
+        		  .catch(function (error) {
+        		    // handle error
+        		    console.log(error);
+        		  });
         	},
         	
         	getFiles: function() {
