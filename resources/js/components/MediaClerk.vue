@@ -4,7 +4,7 @@
             <div class="col-md-8">
 
 
-  
+
   <b-table striped hover :items="files" :fields="fields">
 		<!-- A virtual column -->
 		<template v-slot:cell(size)="data">
@@ -13,7 +13,8 @@
   
 		<!-- A virtual column -->
 		<template v-slot:cell(progress)="data">
-			<b-progress :value="Number(data.value)" show-progress animated></b-progress>
+			<font-awesome-icon v-if="data.item.success" icon="check" :style="{ color: 'green' }" size="lg"/>
+			<b-progress v-else :value="Number(data.value)" show-progress animated></b-progress>
 		</template>
   </b-table>
 
@@ -45,6 +46,13 @@
 import FileUpload from 'vue-upload-component';
 import { TablePlugin, ProgressPlugin } from 'bootstrap-vue';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(fas)
+
 Vue.use(TablePlugin)
 Vue.use(ProgressPlugin)
 
@@ -53,7 +61,7 @@ Vue.use(ProgressPlugin)
 	  	data: function () {
 		    return {
 		      files: [],
-		      fields: ['name','type','size','success','progress'],
+		      fields: ['name','type','size','progress'],
 		    }
 		},
 		computed: {
@@ -74,6 +82,7 @@ Vue.use(ProgressPlugin)
 		
 		components: {
 			FileUpload,
+			FontAwesomeIcon
 // 			TablePlugin
 		},
 		
