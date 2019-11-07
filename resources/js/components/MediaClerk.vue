@@ -3,9 +3,19 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
 
-  <ul>
-    <li v-for="file in files">{{file.name}} - Error: {{file.error}}, Success: {{file.success}}</li>
-  </ul>
+
+  
+  <b-table striped hover :items="files" :fields="fields">
+		<!-- A virtual column -->
+		<template v-slot:cell(size)="data">
+			{{ formatBytes(data.value) }}
+		</template>
+  
+		<!-- A virtual column -->
+		<template v-slot:cell(progress)="data">
+			<b-progress :value="Number(data.value)" show-progress animated></b-progress>
+		</template>
+  </b-table>
 
   <file-upload
     ref="upload"
@@ -32,13 +42,18 @@
 
 <script>
 
-const VueUploadComponent = require('vue-upload-component')
+import FileUpload from 'vue-upload-component';
+import { TablePlugin, ProgressPlugin } from 'bootstrap-vue';
+
+Vue.use(TablePlugin)
+Vue.use(ProgressPlugin)
 
     export default {
 		props: ['apiToken'],
 	  	data: function () {
 		    return {
 		      files: [],
+		      fields: ['name','type','size','success','progress'],
 		    }
 		},
 		computed: {
@@ -58,7 +73,8 @@ const VueUploadComponent = require('vue-upload-component')
 
 		
 		components: {
-			FileUpload: VueUploadComponent
+			FileUpload,
+// 			TablePlugin
 		},
 		
         mounted() {
@@ -105,6 +121,18 @@ const VueUploadComponent = require('vue-upload-component')
 			        newFile.blob = URL.createObjectURL(newFile.file)
 			      }
 				
+        	},
+        	
+        	formatBytes: function(bytes, decimals = 2) {
+        	    if (bytes === 0) return '0 Bytes';
+
+        	    const k = 1024;
+        	    const dm = decimals < 0 ? 0 : decimals;
+        	    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        	    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        	    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         	}
     	}
 	}
