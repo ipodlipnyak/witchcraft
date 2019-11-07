@@ -20,7 +20,10 @@ class MediaClerkController extends Controller
      */
     public function index()
     {
-        $result = MediaFiles::query()->with('UploadSession')->where('user', Auth::user()->id)->where('start_offset',null)->get();
+        $result = MediaFiles::query()->with('UploadSession')
+            ->where('user', Auth::user()->id)
+            ->where('start_offset', null)
+            ->get();
         return response()->json($result);
     }
 
@@ -110,8 +113,7 @@ class MediaClerkController extends Controller
                         $file_model->upload_session = request('session_id');
                         $file_model->save();
                     }
-                    
-                    
+
                     // remove chunk from disk and db
                     Storage::disk($disk)->delete($chunk_path);
                     $chunk_model->delete();
@@ -166,13 +168,23 @@ class MediaClerkController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove file from storage and db
      *
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy()
     {
-        //
+        $result = [
+            'status' => 'error'
+        ];
+
+        $file_model = MediaFiles::query()->find(request('id'));
+        Storage::disk($file_model->storage_disk)->delete($file_model->storage_path);
+        if ($file_model->delete()) {
+            $result['status'] = 'success';
+        }
+
+        return response()->json($result);
     }
 }

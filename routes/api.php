@@ -23,5 +23,6 @@ Route::middleware([
     Route::prefix('files')->group(function () {
         Route::get('/', 'API\MediaClerkController@index');
         Route::post('/upload', 'API\MediaClerkController@store');
+        Route::delete('/{id}', 'API\MediaClerkController@destroy');
     });
 });

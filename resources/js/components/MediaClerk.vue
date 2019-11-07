@@ -19,6 +19,12 @@
 				{{ formatBytes(data.item.upload_session.size) }}
 			</p>
 		</template>
+		
+		<template v-slot:cell(delete)="data">
+			<b-button @click="deleteFile(data.item.id)" block variant="danger">
+			<font-awesome-icon icon="times" :style="{ color: 'white' }" size="sm"/>
+			</b-button>
+		</template>
   </b-table>
 
   </b-collapse>
@@ -103,6 +109,7 @@ Vue.use(ButtonGroupPlugin)
 		    	  { key: 'name_to_display', label: 'Name', sortable: true },
 		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
 		          { key: 'upload_session.size', label: 'Size', sortable: true },
+		          { key: 'delete', label: '', sortable: false },
 		          ],
 		      uploaded_sortBy: 'name_to_display',
 		      uploaded_sortDesc: false,
@@ -138,6 +145,10 @@ Vue.use(ButtonGroupPlugin)
         },
         
         methods: {
+        	deleteFile: function(el) {
+        		self = this;
+        		console.log(el);
+        	},
         	
         	getFiles: function() {
         		self = this;

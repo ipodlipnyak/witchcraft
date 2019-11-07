@@ -11622,6 +11622,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -11653,6 +11659,10 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
         key: 'upload_session.size',
         label: 'Size',
         sortable: true
+      }, {
+        key: 'delete',
+        label: '',
+        sortable: false
       }],
       uploaded_sortBy: 'name_to_display',
       uploaded_sortDesc: false
@@ -11681,6 +11691,10 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
     this.getFiles();
   },
   methods: {
+    deleteFile: function deleteFile(el) {
+      self = this;
+      console.log(el);
+    },
     getFiles: function getFiles() {
       self = this; // Make a request for a user with a given ID
 
@@ -75962,6 +75976,31 @@ var render = function() {
                               )
                             ])
                           : _vm._e()
+                      ]
+                    }
+                  },
+                  {
+                    key: "cell(delete)",
+                    fn: function(data) {
+                      return [
+                        _c(
+                          "b-button",
+                          {
+                            attrs: { block: "", variant: "danger" },
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteFile(data.item.id)
+                              }
+                            }
+                          },
+                          [
+                            _c("font-awesome-icon", {
+                              style: { color: "white" },
+                              attrs: { icon: "times", size: "sm" }
+                            })
+                          ],
+                          1
+                        )
                       ]
                     }
                   }
