@@ -11624,6 +11624,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -11714,6 +11717,10 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    removeFileFromUploadQuery: function removeFileFromUploadQuery(file) {
+      var index = this.files.indexOf(file);
+      this.files.splice(index, 1);
     },
     getFiles: function getFiles() {
       self = this;
@@ -76069,6 +76076,27 @@ var render = function() {
                                 style: { color: "green" },
                                 attrs: { icon: "check", size: "lg" }
                               })
+                            : data.item.progress == "0.00"
+                            ? _c(
+                                "b-button",
+                                {
+                                  attrs: { block: "", variant: "danger" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.removeFileFromUploadQuery(
+                                        data.item
+                                      )
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("font-awesome-icon", {
+                                    style: { color: "white" },
+                                    attrs: { icon: "times", size: "sm" }
+                                  })
+                                ],
+                                1
+                              )
                             : _c("b-progress", {
                                 attrs: {
                                   value: Number(data.value),
@@ -76082,7 +76110,7 @@ var render = function() {
                   ],
                   null,
                   false,
-                  3089857122
+                  4019410707
                 )
               })
             : _vm._e(),
@@ -90516,15 +90544,14 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /*!************************************************!*\
   !*** ./resources/js/components/MediaClerk.vue ***!
   \************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true& */ "./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true&");
 /* harmony import */ var _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MediaClerk.vue?vue&type=script&lang=js& */ "./resources/js/components/MediaClerk.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -90554,7 +90581,7 @@ component.options.__file = "resources/js/components/MediaClerk.vue"
 /*!*************************************************************************!*\
   !*** ./resources/js/components/MediaClerk.vue?vue&type=script&lang=js& ***!
   \*************************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

@@ -37,6 +37,9 @@
   
 		<template v-slot:cell(progress)="data">
 			<font-awesome-icon v-if="data.item.success" icon="check" :style="{ color: 'green' }" size="lg"/>
+			<b-button v-else-if="data.item.progress == '0.00'" @click="removeFileFromUploadQuery(data.item)" block variant="danger">
+			<font-awesome-icon icon="times" :style="{ color: 'white' }" size="sm"/>
+			</b-button>
 			<b-progress v-else :value="Number(data.value)" show-progress animated></b-progress>
 		</template>
   </b-table>
@@ -174,6 +177,11 @@ Vue.use(ButtonGroupPlugin)
         		  .catch(function (error) {
         		    console.log(error);
         		  });
+        	},
+        	
+        	removeFileFromUploadQuery: function(file) {
+        		let index = this.files.indexOf(file);
+        		this.files.splice(index, 1);
         	},
         	
         	getFiles: function() {
