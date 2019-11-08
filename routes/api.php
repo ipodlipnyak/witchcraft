@@ -21,8 +21,8 @@ Route::middleware([
     'auth:api'
 ])->group(function () {
     Route::prefix('files')->group(function () {
-        Route::get('/', 'API\MediaClerkController@index');
-        Route::post('/upload', 'API\MediaClerkController@store');
-        Route::delete('/{id}', 'API\MediaClerkController@destroy');
+        Route::get('/', 'API\MediaController@index');
+        Route::post('/upload', 'API\MediaController@store');
+        Route::delete('/{id}', 'API\MediaController@destroy');
     });
 });

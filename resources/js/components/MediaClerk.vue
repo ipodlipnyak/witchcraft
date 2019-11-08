@@ -4,7 +4,7 @@
             <div class="col-md-8">
 
   <b-button v-if="filesUploaded.length > 0" block squared v-b-toggle.uploaded-files variant="primary">Uploaded files</b-button>
-  <b-collapse id="uploaded-files" class="mt-2">
+  <b-collapse v-if="filesUploaded.length > 0" id="uploaded-files" class="mt-2">
 
   <b-table striped hover 
   		:items="filesUploaded" 
@@ -56,6 +56,7 @@
     
     :multiple="true"
     
+    
     class="btn btn-primary btn-square"
 
   >
@@ -78,7 +79,6 @@ import FileUpload from 'vue-upload-component';
 import { TablePlugin, ProgressPlugin, CollapsePlugin, ButtonPlugin, ButtonGroupPlugin } from 'bootstrap-vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -123,6 +123,18 @@ Vue.use(ButtonGroupPlugin)
 			          maxRetries: 5
 		          };
 			},
+			
+			uploadFinished: function () {
+				let result = true;
+				
+				this.files.forEach(function(file){
+					if (file.success == false) {
+						result = false;
+					}
+				});
+				
+				return result;
+			},
 		},
 
 		
@@ -138,6 +150,15 @@ Vue.use(ButtonGroupPlugin)
         mounted() {
 			this.getFiles();
         },
+        
+        watch: {
+            uploadFinished: function (newVal, oldVal) {
+            	if (oldVal == false) {
+            		this.getFiles();
+            		this.files = [];
+            	}
+			}
+		},
         
         methods: {
         	deleteFile: function(id) {

@@ -11624,11 +11624,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-
 
 
 
@@ -11679,6 +11674,15 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
         maxActive: 3,
         maxRetries: 5
       };
+    },
+    uploadFinished: function uploadFinished() {
+      var result = true;
+      this.files.forEach(function (file) {
+        if (file.success == false) {
+          result = false;
+        }
+      });
+      return result;
     }
   },
   components: {
@@ -11690,29 +11694,32 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
   mounted: function mounted() {
     this.getFiles();
   },
+  watch: {
+    uploadFinished: function uploadFinished(newVal, oldVal) {
+      if (oldVal == false) {
+        this.getFiles();
+        this.files = [];
+      }
+    }
+  },
   methods: {
     deleteFile: function deleteFile(id) {
       self = this;
       axios["delete"]('/api/files/' + id + '?api_token=' + this.apiToken).then(function (response) {
-        // handle success
         if (response.data.status == 'success') {
           self.getFiles();
         } else {
           console.log(response.data);
         }
       })["catch"](function (error) {
-        // handle error
         console.log(error);
       });
     },
     getFiles: function getFiles() {
-      self = this; // Make a request for a user with a given ID
-
+      self = this;
       axios.get('/api/files?api_token=' + this.apiToken).then(function (response) {
-        // handle success
         self.filesUploaded = response.data;
       })["catch"](function (error) {
-        // handle error
         console.log(error);
       });
     },
@@ -11744,7 +11751,7 @@ Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["ButtonGroupPlugin"]);
      */
     inputFilter: function inputFilter(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
-        // Filter non-image file
+        // Filter non-media file
         if (!/\.(mkv|mp4)$/i.test(newFile.name)) {
           return prevent();
         }
@@ -75942,85 +75949,92 @@ var render = function() {
               )
             : _vm._e(),
           _vm._v(" "),
-          _c(
-            "b-collapse",
-            { staticClass: "mt-2", attrs: { id: "uploaded-files" } },
-            [
-              _c("b-table", {
-                attrs: {
-                  striped: "",
-                  hover: "",
-                  items: _vm.filesUploaded,
-                  fields: _vm.fields_uploaded,
-                  "sort-by": _vm.uploaded_sortBy,
-                  "sort-desc": _vm.uploaded_sortDesc,
-                  responsive: "sm"
-                },
-                on: {
-                  "update:sortBy": function($event) {
-                    _vm.uploaded_sortBy = $event
-                  },
-                  "update:sort-by": function($event) {
-                    _vm.uploaded_sortBy = $event
-                  },
-                  "update:sortDesc": function($event) {
-                    _vm.uploaded_sortDesc = $event
-                  },
-                  "update:sort-desc": function($event) {
-                    _vm.uploaded_sortDesc = $event
-                  }
-                },
-                scopedSlots: _vm._u([
-                  {
-                    key: "cell(upload_session.size)",
-                    fn: function(data) {
-                      return [
-                        data.item.upload_session
-                          ? _c("p", [
-                              _vm._v(
-                                "\n\t\t\t\t" +
-                                  _vm._s(
-                                    _vm.formatBytes(
-                                      data.item.upload_session.size
+          _vm.filesUploaded.length > 0
+            ? _c(
+                "b-collapse",
+                { staticClass: "mt-2", attrs: { id: "uploaded-files" } },
+                [
+                  _c("b-table", {
+                    attrs: {
+                      striped: "",
+                      hover: "",
+                      items: _vm.filesUploaded,
+                      fields: _vm.fields_uploaded,
+                      "sort-by": _vm.uploaded_sortBy,
+                      "sort-desc": _vm.uploaded_sortDesc,
+                      responsive: "sm"
+                    },
+                    on: {
+                      "update:sortBy": function($event) {
+                        _vm.uploaded_sortBy = $event
+                      },
+                      "update:sort-by": function($event) {
+                        _vm.uploaded_sortBy = $event
+                      },
+                      "update:sortDesc": function($event) {
+                        _vm.uploaded_sortDesc = $event
+                      },
+                      "update:sort-desc": function($event) {
+                        _vm.uploaded_sortDesc = $event
+                      }
+                    },
+                    scopedSlots: _vm._u(
+                      [
+                        {
+                          key: "cell(upload_session.size)",
+                          fn: function(data) {
+                            return [
+                              data.item.upload_session
+                                ? _c("p", [
+                                    _vm._v(
+                                      "\n\t\t\t\t" +
+                                        _vm._s(
+                                          _vm.formatBytes(
+                                            data.item.upload_session.size
+                                          )
+                                        ) +
+                                        "\n\t\t\t"
                                     )
-                                  ) +
-                                  "\n\t\t\t"
+                                  ])
+                                : _vm._e()
+                            ]
+                          }
+                        },
+                        {
+                          key: "cell(delete)",
+                          fn: function(data) {
+                            return [
+                              _c(
+                                "b-button",
+                                {
+                                  attrs: { block: "", variant: "danger" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.deleteFile(data.item.id)
+                                    }
+                                  }
+                                },
+                                [
+                                  _c("font-awesome-icon", {
+                                    style: { color: "white" },
+                                    attrs: { icon: "times", size: "sm" }
+                                  })
+                                ],
+                                1
                               )
-                            ])
-                          : _vm._e()
-                      ]
-                    }
-                  },
-                  {
-                    key: "cell(delete)",
-                    fn: function(data) {
-                      return [
-                        _c(
-                          "b-button",
-                          {
-                            attrs: { block: "", variant: "danger" },
-                            on: {
-                              click: function($event) {
-                                return _vm.deleteFile(data.item.id)
-                              }
-                            }
-                          },
-                          [
-                            _c("font-awesome-icon", {
-                              style: { color: "white" },
-                              attrs: { icon: "times", size: "sm" }
-                            })
-                          ],
-                          1
-                        )
-                      ]
-                    }
-                  }
-                ])
-              })
-            ],
-            1
-          ),
+                            ]
+                          }
+                        }
+                      ],
+                      null,
+                      false,
+                      1546878828
+                    )
+                  })
+                ],
+                1
+              )
+            : _vm._e(),
           _vm._v(" "),
           _vm.filesUploaded.length > 0 ? _c("hr") : _vm._e(),
           _vm._v(" "),
@@ -90502,14 +90516,15 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /*!************************************************!*\
   !*** ./resources/js/components/MediaClerk.vue ***!
   \************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _MediaClerk_vue_vue_type_template_id_87ccfa08_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true& */ "./resources/js/components/MediaClerk.vue?vue&type=template&id=87ccfa08&scoped=true&");
 /* harmony import */ var _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MediaClerk.vue?vue&type=script&lang=js& */ "./resources/js/components/MediaClerk.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _MediaClerk_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -90539,7 +90554,7 @@ component.options.__file = "resources/js/components/MediaClerk.vue"
 /*!*************************************************************************!*\
   !*** ./resources/js/components/MediaClerk.vue?vue&type=script&lang=js& ***!
   \*************************************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
