@@ -13,7 +13,6 @@
       	:sort-desc.sync="uploaded_sortDesc"
       	responsive="sm">
 
-		<!-- A virtual column -->
 		<template v-slot:cell(upload_session.size)="data">
 			<p v-if="data.item.upload_session">
 				{{ formatBytes(data.item.upload_session.size) }}
@@ -32,12 +31,10 @@
 <hr v-if="filesUploaded.length > 0"/>
 
   <b-table v-if="files.length > 0" striped hover :items="files" :fields="fields_files">
-		<!-- A virtual column -->
 		<template v-slot:cell(size)="data">
 			{{ formatBytes(data.value) }}
 		</template>
   
-		<!-- A virtual column -->
 		<template v-slot:cell(progress)="data">
 			<font-awesome-icon v-if="data.item.success" icon="check" :style="{ color: 'green' }" size="lg"/>
 			<b-progress v-else :value="Number(data.value)" show-progress animated></b-progress>
@@ -69,8 +66,6 @@
       <b-button squared v-if="files.length > 0" v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" variant="success">Start upload</b-button>
       <b-button squared v-if="files.length > 0" v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" variant="danger">Stop upload</b-button>
     </b-button-group>
-<!--   <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" type="button" class="btn btn-success">Start upload</button> -->
-<!--   <button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" type="button" class="btn btn-warning">Stop upload</button> -->
 
             </div>
         </div>
@@ -149,7 +144,6 @@ Vue.use(ButtonGroupPlugin)
         		self = this;
         		axios.delete('/api/files/' + id + '?api_token=' + this.apiToken)
         		  .then(function (response) {
-        		    // handle success
         		    if (response.data.status == 'success') {
         		    	self.getFiles();
         		    } else {
@@ -157,21 +151,17 @@ Vue.use(ButtonGroupPlugin)
         		    }
         		  })
         		  .catch(function (error) {
-        		    // handle error
         		    console.log(error);
         		  });
         	},
         	
         	getFiles: function() {
         		self = this;
-        		// Make a request for a user with a given ID
         		axios.get('/api/files?api_token=' + this.apiToken)
         		  .then(function (response) {
-        		    // handle success
         		    self.filesUploaded = response.data;
         		  })
         		  .catch(function (error) {
-        		    // handle error
         		    console.log(error);
         		  });
         	},
@@ -202,7 +192,7 @@ Vue.use(ButtonGroupPlugin)
              */
             inputFilter: function (newFile, oldFile, prevent) {
 				if (newFile && !oldFile) {
-                	// Filter non-image file
+                	// Filter non-media file
                 	if (!/\.(mkv|mp4)$/i.test(newFile.name)) {
                   		return prevent()
                 	}
