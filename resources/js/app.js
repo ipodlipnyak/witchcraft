@@ -27,6 +27,25 @@ Vue.component('media-clerk', require('./components/MediaClerk.vue').default);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+Vue.directive("pan", {
+	bind: function(el, binding) {
+		if (typeof binding.value === "function") {
+			const mc = new Hammer(el);
+			mc.get("pan").set({ direction: Hammer.DIRECTION_ALL });
+			mc.on("pan", binding.value);
+		}
+	}
+});
+
+Vue.directive("tap", {
+	bind: function(el, binding) {
+		if (typeof binding.value === "function") {
+			const mc = new Hammer(el);
+			mc.on("tap", binding.value);
+		}
+	}
+});
+
 const app = new Vue({
     el: '#app',
 });

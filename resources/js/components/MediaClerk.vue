@@ -1,97 +1,54 @@
 <template>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
 
-  <b-button v-if="filesUploaded.length > 0" block squared v-b-toggle.uploaded-files variant="primary">Uploaded files</b-button>
-  <b-collapse v-if="filesUploaded.length > 0" id="uploaded-files" class="mt-2">
+<div class="slider__list" ref="list"  v-pan="onPan">
+	<div v-for="(slide, index) in slides" :key="slide.label"
+		v-tap="(e) => onTap(e, slide)"
+		class="slider__item"
+		:style="{backgroundColor: colors[index]}">
+		<component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component"></component>
+	</div>
+</div>
 
-  <b-table striped hover 
-  		:items="filesUploaded" 
-  		:fields="fields_uploaded"
-		:sort-by.sync="uploaded_sortBy"
-      	:sort-desc.sync="uploaded_sortDesc"
-      	responsive="sm">
-
-		<template v-slot:cell(upload_session.size)="data">
-			<p v-if="data.item.upload_session">
-				{{ formatBytes(data.item.upload_session.size) }}
-			</p>
-		</template>
-		
-		<template v-slot:cell(delete)="data">
-			<b-button @click="deleteFile(data.item.id)" block variant="danger">
-			<font-awesome-icon icon="times" :style="{ color: 'white' }" size="sm"/>
-			</b-button>
-		</template>
-  </b-table>
-
-  </b-collapse>
-
-<hr v-if="filesUploaded.length > 0"/>
-
-  <b-table v-if="files.length > 0" striped hover :items="files" :fields="fields_files">
-		<template v-slot:cell(size)="data">
-			{{ formatBytes(data.value) }}
-		</template>
-  
-		<template v-slot:cell(progress)="data">
-			<font-awesome-icon v-if="data.item.success" icon="check" :style="{ color: 'green' }" size="lg"/>
-			<b-button v-else-if="data.item.progress == '0.00'" @click="removeFileFromUploadQuery(data.item)" block variant="danger">
-			<font-awesome-icon icon="times" :style="{ color: 'white' }" size="sm"/>
-			</b-button>
-			<b-progress v-else :value="Number(data.value)" show-progress animated></b-progress>
-		</template>
-  </b-table>
-
-    <b-button-group size="bg" class="btn-block">
-    
-  <file-upload
-    ref="upload"
-    v-model="files"
-    post-action="/post.method"
-    put-action="/put.method"
-    @input-file="inputFile"
-    @input-filter="inputFilter"
-    
-    chunk-enabled
-    :chunk="chunk"
-    
-    :multiple="true"
-    
-    
-    class="btn btn-primary btn-square"
-
-  >
-  <font-awesome-icon icon="plus" :style="{ color: 'white' }"/>
-  Upload file
-  </file-upload>
-    
-      <b-button squared v-if="files.length > 0" v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" variant="success">Start upload</b-button>
-      <b-button squared v-if="files.length > 0" v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" variant="danger">Stop upload</b-button>
-    </b-button-group>
-
-            </div>
-        </div>
-    </div>
 </template>
 
 <script>
 
-import FileUpload from 'vue-upload-component';
-import { TablePlugin, ProgressPlugin, CollapsePlugin, ButtonPlugin, ButtonGroupPlugin } from 'bootstrap-vue';
+jQuery.expr.filters.offscreen = function(el) {
+	  var rect = el.getBoundingClientRect();
+	  return (
+	           (rect.x + rect.width) < 0 
+	             || (rect.y + rect.height) < 0
+	             || (rect.x > window.innerWidth || rect.y > window.innerHeight)
+	         );
+	};
+	
+window.checkOverflow = function (el)
+	{
+	   var curOverflow = el.style.overflow;
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+	   if ( !curOverflow || curOverflow === "visible" )
+	      el.style.overflow = "hidden";
 
-library.add(fas)
+	   var isOverflowing = el.clientWidth < el.scrollWidth 
+	      || el.clientHeight < el.scrollHeight;
 
-Vue.use(TablePlugin)
-Vue.use(ProgressPlugin)
-Vue.use(CollapsePlugin)
-Vue.use(ButtonPlugin)
-Vue.use(ButtonGroupPlugin)
+	   el.style.overflow = curOverflow;
+
+	   return isOverflowing;
+	}
+
+
+// import VueScrollSnap from 'vue-scroll-snap'
+
+import Uploader from './Uploader'
+import Projects from './Projects'
+
+import VueScrollSnap from './VueScrollSnap'
+import VueScrollactive from 'vue-scrollactive'
+
+import {TweenMax} from "gsap/TweenMax";
+
+Vue.use(VueScrollactive)
 
 
 
@@ -99,158 +56,215 @@ Vue.use(ButtonGroupPlugin)
 		props: ['apiToken'],
 	  	data: function () {
 		    return {
-		      files: [],
-		      fields_files: ['name','type','size','progress'],
+		    	slides: [
+		    		{
+		    			label: 'uploader',
+		    			component: 'uploader'
+		    		},
+		    		{
+		    			label: 'projects',
+		    			component: 'projects'
+		    		},
+		    	],
 		      
-		      filesUploaded: [],
-		      fields_uploaded: [
-		    	  { key: 'name_to_display', label: 'Name', sortable: true },
-		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
-		          { key: 'upload_session.size', label: 'Size', sortable: true },
-		          { key: 'delete', label: '', sortable: false },
-		          ],
-		      uploaded_sortBy: 'name_to_display',
-		      uploaded_sortDesc: false,
+		      currentOffset: 0,
+		      colors: [
+					"#F7CC45",
+					"#AC6909",
+					"#272625",
+					"#FFAD01",
+					"#81DC58",
+					"#C68E71",
+					"#F2B2BD",
+					"#FFCB00",
+					"#BE9763"
+		      ],
 		    }
 		},
 		computed: {
-			uploadAction: function () {
-				return '/api/files/upload?api_token=' + this.apiToken;
+			overflowRatio() {
+				return this.$refs.list.scrollWidth / this.$refs.list.offsetWidth;
+			},
+			itemWidth() {
+				return this.$refs.list.scrollWidth / this.slides.length;
+			},
+// 			selectedContent() {
+// 				if (this.selected) {
+// 					return this.emojis[this.slides.indexOf(this.selected)];
+// 				}
+// 				return "";
+// 			},
+			count() {
+				return this.slides.length;
 			},
 			
-			chunk: function () {
-		          return {
-		        	  action: this.uploadAction,
-			          minSize: 1048576,
-			          maxActive: 3,
-			          maxRetries: 5
-		          };
-			},
-			
-			uploadFinished: function () {
-				let result = true;
-				
-				this.files.forEach(function(file){
-					if (file.success == false) {
-						result = false;
-					}
-				});
-				
-				return result;
+			fuck: function() {
+// 				var result = false;
+// 				let container = $('.scroll-snap-container');
+// 				let container_width = container.parent().width();
+// 				container.find('.item').each(function(i) {
+// 					if ((container_width / 2) < Math.abs($(this).position().left)) {
+// 						result = $(this);
+// 					}
+// 				});
+// 				return result;
+// 				$('#fuck1').parent().width();
+				return Math.abs($('#fuck1').position().left);
+// 				return $('#fuck1').is(':visible');
 			},
 		},
 
 		
 		components: {
-			FileUpload,
-			FontAwesomeIcon
+			Uploader,
+			Projects,
+			VueScrollSnap
 		},
 		
 		beforeMount() {
 			//
 		},
 		
+		created() {
+			window.addEventListener("scroll", this.handleScroll)
+		},
+		
         mounted() {
-			this.getFiles();
+			//
+        },
+        
+        destroyed () {
+        	window.removeEventListener("scroll", this.handleScroll)
         },
         
         watch: {
-            uploadFinished: function (newVal, oldVal) {
-            	if (oldVal == false) {
-            		this.getFiles();
-            		this.files = [];
-            	}
-			}
+            //
 		},
         
         methods: {
-        	deleteFile: function(id) {
-        		self = this;
-        		axios.delete('/api/files/' + id + '?api_token=' + this.apiToken)
-        		  .then(function (response) {
-        		    if (response.data.status == 'success') {
-        		    	self.getFiles();
+        	onPan: function(e) {
+        		  // how far the slider has been dragged in percentage of the visible container
+        		  const dragOffset = 100 / this.itemWidth * e.deltaX / this.slides.length * this.overflowRatio;
+
+        		  // transforming from where the slider currently 
+        		  const transform = this.currentOffset + dragOffset;
+
+        		  // updating the transform with CSS Variables
+        		  this.$refs.list.style.setProperty("--x", transform);
+
+        		  // user stopped touching, this is the last event
+        		  if (e.isFinal) {
+        			  let finalOffset = 0;
+        		    // how far we can drag depends on how much our slider is overflowing
+        		    const maxScroll = 100 - this.overflowRatio * 100;
+        		    
+        		    // animate to last item
+        		    if (this.currentOffset <= maxScroll) {
+        		      finalOffset = maxScroll;
+        		    } else if (this.currentOffset >= 0) { 
+        		      // animate to first item
+        		      finalOffset = 0;
         		    } else {
-        		    	console.log(response.data);
-        		    }
-        		  })
-        		  .catch(function (error) {
-        		    console.log(error);
-        		  });
+        		    // animate to next item according to pan direction
+        		    const index = this.currentOffset / this.overflowRatio / 100 * this.count;
+        		    const nextIndex = e.deltaX <= 0 ? Math.floor(index) : Math.ceil(index);
+        		    finalOffset = 100 * this.overflowRatio / this.count * nextIndex;
+        		  }
+
+        		    // animate it!
+        		    TweenMax.fromTo(this.$refs.list, 0.5,
+        		      { '--x': this.currentOffset },
+        		      { '--x': finalOffset,
+        		        ease: Elastic.easeOut.config(1, 0.8),
+        		        onComplete: () => {
+        		          this.currentOffset = finalOffset;
+        		        }
+        		      }
+        		    );
+        		  }
         	},
-        	
-        	removeFileFromUploadQuery: function(file) {
-        		let index = this.files.indexOf(file);
-        		this.files.splice(index, 1);
+        	onTap: function() {
+        		console.log('tap');
         	},
-        	
-        	getFiles: function() {
-        		self = this;
-        		axios.get('/api/files?api_token=' + this.apiToken)
-        		  .then(function (response) {
-        		    self.filesUploaded = response.data;
-        		  })
-        		  .catch(function (error) {
-        		    console.log(error);
-        		  });
-        	},
-        	
-            /**
-             * Has changed
-             * @param  Object|undefined   newFile   Read only
-             * @param  Object|undefined   oldFile   Read only
-             * @return undefined
-             */
-            inputFile: function (newFile, oldFile) {
-              if (newFile && oldFile && !newFile.active && oldFile.active) {
-                // Get response data
-                console.log('response', newFile.response)
-                if (newFile.xhr) {
-                  //  Get the response status code
-                  console.log('status', newFile.xhr.status)
-                }
-              }
+            handleScroll () {
+            	console.log('swoop');
             },
-            
-            /**
-             * Pretreatment
-             * @param  Object|undefined   newFile   Read and write
-             * @param  Object|undefined   oldFile   Read only
-             * @param  Function           prevent   Prevent changing
-             * @return undefined
-             */
-            inputFilter: function (newFile, oldFile, prevent) {
-				if (newFile && !oldFile) {
-                	// Filter non-media file
-                	if (!/\.(mkv|mp4)$/i.test(newFile.name)) {
-                  		return prevent()
-                	}
-            	}
-				
-			      // Create a blob field
-			      newFile.blob = ''
-			      let URL = window.URL || window.webkitURL
-			      if (URL && URL.createObjectURL) {
-			        newFile.blob = URL.createObjectURL(newFile.file)
-			      }
-				
-        	},
-        	
-        	formatBytes: function(bytes, decimals = 2) {
-        	    if (bytes === 0) return '0 Bytes';
-
-        	    const k = 1024;
-        	    const dm = decimals < 0 ? 0 : decimals;
-        	    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-        	    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        	    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-        	}
     	}
 	}
 </script>
 
 <style scoped>
+  .item {
+    /* Set the minimum height of the items to be the same as the height of the scroll-snap-container.*/
+    min-width: 100%;
+/*     flex: 0 0 100%; */
+  }
+ 
+  .scroll-snap-container {
+    height: 250px;
+/*     width: 500px; */
+    flex: 0 0 100%;
+  }
+  
+  .slider__list {
+  		display: flex;
+ 		width: 100%;
+ 		height: 100%;
+ 		min-height: 100%;
+		overflow: hidden;
+  		transform: translateX(calc(var(--x, 0) * 1%));
+  		padding-left: 0px;
+  }
+  
+  .slider__item {
+  		position: relative;
+  		flex: 0 0 100%;
+  		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+/* 		margin-right: 12px; */
+/* 		padding: 6px; */
+  }
+/*  
+.slider {
+	width: 100%;
+	height: 120px;
+	overflow: visible;
+  position: relative;
+  white-space: nowrap;
 
+	&__list {
+		display: flex;
+		width: 100%;
+		height: 100%;
+		
+		font-size: 2rem;
+		backface-visibility: hidden;
+		transform: translateX(calc(var(--x, 0) * 1%));
+	}
+	
+	&__item {
+		position: relative;
+		flex: 0 0 140px;
+		
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+		margin-right: 12px;
+		padding: 6px;
+		box-sizing: border-box;
+		
+		border-radius: 8px;
+		text-align: center;
+  	transition: opacity 0.15s ease;
+		color: #fff;
+
+		&:focus {
+			opacity: 0.8;
+		}
+	}
+}
+*/
 </style>

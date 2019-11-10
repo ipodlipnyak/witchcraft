@@ -21,6 +21,8 @@ try {
 
 window.axios = require('axios');
 
+window.Hammer = require('hammerjs');
+
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /**
