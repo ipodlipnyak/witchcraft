@@ -1,13 +1,14 @@
 <template>
-
+<section class="slider">
 <div class="slider__list" ref="list"  v-pan="onPan">
 	<div v-for="(slide, index) in slides" :key="slide.label"
 		v-tap="(e) => onTap(e, slide)"
 		class="slider__item"
-		:style="{backgroundColor: colors[index]}">
+		>
 		<component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component"></component>
 	</div>
 </div>
+</section>
 
 </template>
 
@@ -63,6 +64,10 @@ Vue.use(VueScrollactive)
 		    		},
 		    		{
 		    			label: 'projects',
+		    			component: 'projects'
+		    		},
+		    		{
+		    			label: 'dumdum',
 		    			component: 'projects'
 		    		},
 		    	],
@@ -155,6 +160,7 @@ Vue.use(VueScrollactive)
         		  // user stopped touching, this is the last event
         		  if (e.isFinal) {
         			  let finalOffset = 0;
+        			  this.currentOffset = transform;
         		    // how far we can drag depends on how much our slider is overflowing
         		    const maxScroll = 100 - this.overflowRatio * 100;
         		    
@@ -165,11 +171,11 @@ Vue.use(VueScrollactive)
         		      // animate to first item
         		      finalOffset = 0;
         		    } else {
-        		    // animate to next item according to pan direction
-        		    const index = this.currentOffset / this.overflowRatio / 100 * this.count;
-        		    const nextIndex = e.deltaX <= 0 ? Math.floor(index) : Math.ceil(index);
-        		    finalOffset = 100 * this.overflowRatio / this.count * nextIndex;
-        		  }
+        		    	// animate to next item according to pan direction
+        		    	const index = this.currentOffset / this.overflowRatio / 100 * this.count;
+        		    	const nextIndex = e.deltaX <= 0 ? Math.floor(index) : Math.ceil(index);
+        		    	finalOffset = 100 * this.overflowRatio / this.count * nextIndex;
+        		    }
 
         		    // animate it!
         		    TweenMax.fromTo(this.$refs.list, 0.5,
@@ -181,6 +187,7 @@ Vue.use(VueScrollactive)
         		        }
         		      }
         		    );
+        		    
         		  }
         	},
         	onTap: function() {
@@ -193,7 +200,7 @@ Vue.use(VueScrollactive)
 	}
 </script>
 
-<style scoped>
+<style lang='scss' scoped>
   .item {
     /* Set the minimum height of the items to be the same as the height of the scroll-snap-container.*/
     min-width: 100%;
@@ -206,14 +213,57 @@ Vue.use(VueScrollactive)
     flex: 0 0 100%;
   }
   
+  .slider {
+	width: 100%;
+	height: 120px;
+	overflow: visible;
+  position: relative;
+  white-space: nowrap;
+
+	&__list {
+		display: flex;
+		flex: 1;
+		width: 100%;
+		height: 100%;
+		font-size: 2rem;
+		backface-visibility: hidden;
+		transform: translateX(calc(var(--x, 0) * 1%));
+	}
+	
+	&__item {
+		position: relative;
+		flex: 0 0 100%;
+		
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+		margin-right: 12px;
+		padding: 6px;
+		box-sizing: border-box;
+		
+		border-radius: 8px;
+		text-align: center;
+  		transition: opacity 0.15s ease;
+		color: #fff;
+
+		&:focus {
+			opacity: 0.8;
+		}
+	}
+}
+  /*
   .slider__list {
   		display: flex;
+  		flex: 1;
  		width: 100%;
  		height: 100%;
  		min-height: 100%;
-		overflow: hidden;
+		overflow: visible;
   		transform: translateX(calc(var(--x, 0) * 1%));
+  		backface-visibility: hidden;
   		padding-left: 0px;
+  		white-space: nowrap;
   }
   
   .slider__item {
@@ -223,9 +273,10 @@ Vue.use(VueScrollactive)
 		justify-content: center;
 		align-items: center;
 		height: 100%;
-/* 		margin-right: 12px; */
-/* 		padding: 6px; */
+ 		margin-right: 12px; 
+ 		padding: 6px; 
   }
+  */
 /*  
 .slider {
 	width: 100%;
