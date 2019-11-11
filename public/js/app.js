@@ -87933,7 +87933,7 @@ var render = function() {
         1
       ),
       _vm._v(" "),
-      _c("main", [
+      _c("main", { staticClass: "d-flex" }, [
         _c("section", { staticClass: "slider" }, [
           _c(
             "div",
@@ -87952,12 +87952,13 @@ var render = function() {
             _vm._l(_vm.slides, function(slide, index) {
               return _c(
                 "div",
-                { key: slide.label, staticClass: "slider__item" },
+                { key: slide.label, staticClass: "slider__item flex-column" },
                 [
                   _c(slide.component, {
                     ref: slide.label,
                     refInFor: true,
                     tag: "component",
+                    staticClass: "slider-content",
                     attrs: { "api-token": _vm.apiToken }
                   })
                 ],

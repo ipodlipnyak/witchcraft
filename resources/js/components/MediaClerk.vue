@@ -8,11 +8,11 @@
         		</b-nav-item>
         	</b-navbar-nav>
         </b-navbar>
-        <main>
+        <main class="d-flex">
         	<section class="slider">
             	<div class="slider__list" ref="list"  v-pan="onPan">
-                	<div v-for="(slide, index) in slides" :key="slide.label" class="slider__item">
-                    	<component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component"></component>
+                	<div v-for="(slide, index) in slides" :key="slide.label" class="slider__item flex-column">
+                    	<component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component" class="slider-content"></component>
                 	</div>
             	</div>
         	</section>

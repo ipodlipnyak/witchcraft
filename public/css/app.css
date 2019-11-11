@@ -13493,3 +13493,8 @@ input[type=color].form-control:disabled {
   box-shadow: 0px -5px 0px -2px white inset;
 }
 
+.slider-content {
+  -webkit-box-flex: 1;
+          flex: 1;
+}
+
