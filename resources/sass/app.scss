@@ -21,31 +21,26 @@
 	overflow: hidden;
 }
 
-.navbar {
-    padding: 0;
-}
-
-%nav-item {
-	border-right: 2px solid #2a2a2e;
-	
-	.nav-link {
-		padding: 1rem;
-		color: #979a9d;
-		
-		p {
-			margin-top: 0;
-			margin-bottom: 0;
-		}
-	}
-}
-
 .nav {
+	&bar {
+		padding: 0;
+	}
+	
 	&-item {
-		@extend %nav-item;
+		border-right: 2px solid #2a2a2e;
+	
+		.nav-link {
+			padding: 1rem;
+			color: #979a9d;
+		
+			p {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		}
 	}
 	
 	&-item.active {
-		@extend %nav-item;
 		.nav-link {
 			color: #fff;
 			box-shadow: 0px -5px 0px -2px white inset;

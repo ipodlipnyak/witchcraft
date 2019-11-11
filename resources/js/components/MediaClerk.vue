@@ -2,7 +2,7 @@
     <div>
         <b-navbar id="nav-header" type="info" variant="dark">
         	<b-navbar-nav>
-        		<b-nav-item v-for="(slide, index) in slides" :key="slide.label" href="#" v-tap="(e) => goToSlide(e, slide)"
+        		<b-nav-item v-for="(slide, index) in slides" :key="slide.label" href="#" v-tap="(e) => selectSlide(e, index)"
         		v-bind:class="[slide == activeSlide ? 'active' : '']">
         		<p>{{ slide.label }}</p>
         		</b-nav-item>
@@ -78,10 +78,12 @@ Vue.use(VueScrollactive)
 		    			label: 'projects',
 		    			component: 'projects'
 		    		},
+		    		{
+		    			label: 'dumdum',
+		    			component: 'projects'
+		    		},
 		    	],
 		    	
-		    	activeSlide: '',
-		      
 		      currentOffset: 0,
 		      colors: [
 					"#F7CC45",
@@ -94,9 +96,22 @@ Vue.use(VueScrollactive)
 					"#FFCB00",
 					"#BE9763"
 		      ],
+		      
+		      activeSlide: '',
 		    }
 		},
 		computed: {
+			slidesOffsets() {
+				let result = [];
+				let self = this;
+				
+				self.slides.forEach(function(slide, index){
+					result[index] = -100 * self.overflowRatio / self.count * index;
+				});
+				
+				return result;
+			},
+			
 			overflowRatio() {
 				return this.$refs.list.scrollWidth / this.$refs.list.offsetWidth;
 			},
@@ -112,6 +127,15 @@ Vue.use(VueScrollactive)
 			count() {
 				return this.slides.length;
 			},
+			
+			
+// 			activeSlide() {
+// 				let self = this;
+// 				return self.slides.find(function(el) {
+// 					let index = self.slides.indexOf(el);
+// 					return self.currentOffset == self.slidesOffsets[index];
+// 				});
+// 			},
 			
 			fuck: function() {
 // 				var result = false;
@@ -153,7 +177,20 @@ Vue.use(VueScrollactive)
         },
         
         watch: {
-            //
+        	currentOffset: function(newVal, oldVal) {
+				let self = this;
+				let bias = 10;
+				let newActiveSlide = self.slides.find(function(el) {
+					let index = self.slides.indexOf(el);
+					let max = newVal + bias;
+					let min = newVal - bias;
+					return min < self.slidesOffsets[index] && self.slidesOffsets[index] < max;
+				});
+				
+				if (newActiveSlide) {
+					self.activeSlide = newActiveSlide;
+				}
+			},
 		},
         
         methods: {
@@ -186,26 +223,45 @@ Vue.use(VueScrollactive)
         		    	const nextIndex = e.deltaX <= 0 ? Math.floor(index) : Math.ceil(index);
         		    	finalOffset = 100 * this.overflowRatio / this.count * nextIndex;
         		    }
+        		    
+        		    this.goToSlide(finalOffset);
 
         		    // animate it!
-        		    TweenMax.fromTo(this.$refs.list, 0.5,
-        		      { '--x': this.currentOffset },
-        		      { '--x': finalOffset,
-        		        ease: Elastic.easeOut.config(1, 0.8),
-        		        onComplete: () => {
-        		          this.currentOffset = finalOffset;
-        		        }
-        		      }
-        		    );
+//         		    TweenMax.fromTo(this.$refs.list, 0.5,
+//         		      { '--x': this.currentOffset },
+//         		      { '--x': finalOffset,
+//         		        ease: Elastic.easeOut.config(1, 0.8),
+//         		        onComplete: () => {
+//         		          this.currentOffset = finalOffset;
+//         		        }
+//         		      }
+//         		    );
         		    
         		  }
         	},
-        	goToSlide: function(e, slide) {
+        	
+        	goToSlide: function(finalOffset) {
+        		// animate it!
+    		    TweenMax.fromTo(this.$refs.list, 0.5,
+    		      { '--x': this.currentOffset },
+    		      { '--x': finalOffset,
+    		        ease: Elastic.easeOut.config(1, 0.8),
+    		        onComplete: () => {
+    		          this.currentOffset = finalOffset;
+    		        }
+    		      }
+    		    );
+        	},
+        	
+        	selectSlide: function(e, slideIndex) {
+        		let slide = this.slides[slideIndex]; 
         		let target = e.target.nodeName == "P" ? e.target : e.target.firstChild;
         		if (slide) {
         			TweenMax.to(target, 0.12, { scale: 1.1, yoyo: true, repeat: 1, ease: Sine.easeOut});
         			this.activeSlide = slide;
         		}
+        		
+        		this.goToSlide(this.slidesOffsets[slideIndex])
         	},
             handleScroll () {
             	console.log('swoop');

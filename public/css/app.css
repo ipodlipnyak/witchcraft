@@ -13474,7 +13474,6 @@ input[type=color].form-control:disabled {
   padding: 0;
 }
 
-.nav-item.active,
 .nav-item {
   border-right: 2px solid #2a2a2e;
 }
