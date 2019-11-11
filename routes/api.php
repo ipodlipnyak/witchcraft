@@ -26,3 +26,14 @@ Route::middleware([
         Route::delete('/{id}', 'API\MediaController@destroy');
     });
 });
+
+Route::middleware([
+    'auth:api'
+])->group(function () {
+    Route::prefix('projects')->group(function () {
+        Route::get('/', 'API\ProjectsController@index');
+        Route::get('/{id}', 'API\ProjectsController@show');
+        Route::post('/create', 'API\ProjectsController@store');
+        Route::delete('/{id}', 'API\ProjectsController@destroy');
+    });
+});

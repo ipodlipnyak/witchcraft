@@ -7,7 +7,7 @@ use App\MediaFiles;
 use Symfony\Component\HttpFoundation\File\File;
 use App\UploadSessions;
 use Illuminate\Support\Facades\DB;
-use App\Project;
+use App\Projects;
 use Illuminate\Support\Facades\Auth;
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
@@ -30,7 +30,7 @@ DB::enableQueryLog();
 // $p->output = $o->id;
 // $p->save();
 
-$result = Project::query()->with('inputs')->get();
+$result = Projects::query()->with('inputs')->get();
 
 // $result = Project::query()->whereHas('output', function($q){
 //     $q->where('user',1);

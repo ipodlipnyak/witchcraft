@@ -11569,6 +11569,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -11711,11 +11712,70 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['apiToken'],
   data: function data() {
-    return {//
+    return {
+      filesUploaded: [],
+      projects: [],
+      projectSelected: ''
     };
+  },
+  mounted: function mounted() {
+    this.getFiles();
+    this.getProjects();
+  },
+  methods: {
+    getFiles: function getFiles() {
+      self = this;
+      axios.get('/api/files?api_token=' + this.apiToken).then(function (response) {
+        self.filesUploaded = response.data;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    getProjects: function getProjects() {
+      self = this;
+      axios.get('/api/projects?api_token=' + this.apiToken).then(function (response) {
+        self.projects = response.data;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    selectProject: function selectProject(id) {
+      self = this;
+
+      if (id > 0) {
+        axios.get('/api/projects/' + id + '?api_token=' + this.apiToken).then(function (response) {
+          if (response.data.status == 'success') {
+            self.projectSelected = response.data.project;
+          }
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      } else {
+        self.projectSelected = id;
+      }
+    }
   }
 });
 
@@ -11737,10 +11797,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.es.js");
 /* harmony import */ var _fortawesome_vue_fontawesome__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @fortawesome/vue-fontawesome */ "./node_modules/@fortawesome/vue-fontawesome/index.es.js");
 /* harmony import */ var gsap_TweenMax__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! gsap/TweenMax */ "./node_modules/gsap/TweenMax.js");
-//
-//
-//
-//
 //
 //
 //
@@ -87954,13 +88010,15 @@ var render = function() {
                 "div",
                 { key: slide.label, staticClass: "slider__item flex-column" },
                 [
-                  _c(slide.component, {
-                    ref: slide.label,
-                    refInFor: true,
-                    tag: "component",
-                    staticClass: "slider-content",
-                    attrs: { "api-token": _vm.apiToken }
-                  })
+                  slide == _vm.activeSlide
+                    ? _c(slide.component, {
+                        ref: slide.label,
+                        refInFor: true,
+                        tag: "component",
+                        staticClass: "slider-content",
+                        attrs: { "api-token": _vm.apiToken }
+                      })
+                    : _c("div")
                 ],
                 1
               )
@@ -87995,7 +88053,78 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("Hi")])
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "row justify-content-center" }, [
+      _c("div", { staticClass: "col-md-8" }, [
+        _vm.projectSelected || _vm.projectSelected === 0
+          ? _c(
+              "div",
+              [
+                _c(
+                  "b-button",
+                  {
+                    attrs: { block: "", squared: "", variant: "primary" },
+                    on: {
+                      click: function($event) {
+                        return _vm.selectProject("")
+                      }
+                    }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v("\n\t" + _vm._s(_vm.projectSelected) + "\n")
+              ],
+              1
+            )
+          : _c(
+              "div",
+              [
+                _c(
+                  "div",
+                  [
+                    _c(
+                      "b-button",
+                      {
+                        attrs: { block: "", squared: "", variant: "primary" },
+                        on: {
+                          click: function($event) {
+                            return _vm.selectProject(0)
+                          }
+                        }
+                      },
+                      [_vm._v("New project")]
+                    )
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _vm._l(_vm.projects, function(project, index) {
+                  return _c(
+                    "div",
+                    { key: project.id },
+                    [
+                      _c(
+                        "b-button",
+                        {
+                          attrs: { block: "", squared: "", variant: "primary" },
+                          on: {
+                            click: function($event) {
+                              return _vm.selectProject(project.id)
+                            }
+                          }
+                        },
+                        [_vm._v(_vm._s(project.output.name_to_display))]
+                      )
+                    ],
+                    1
+                  )
+                })
+              ],
+              2
+            )
+      ])
+    ])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true

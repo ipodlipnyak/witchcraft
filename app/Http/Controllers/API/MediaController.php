@@ -23,6 +23,8 @@ class MediaController extends Controller
         $result = MediaFiles::query()->with('UploadSession')
             ->where('user', Auth::user()->id)
             ->where('start_offset', null)
+            ->where('storage_path','media')
+            ->where('storage_disk','files')
             ->get();
         return response()->json($result);
     }

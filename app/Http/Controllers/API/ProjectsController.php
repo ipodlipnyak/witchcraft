@@ -7,7 +7,7 @@ use App\Projects;
 use Illuminate\Support\Facades\Auth;
 use App\MediaFiles;
 
-class ProjectController extends Controller
+class ProjectsController extends Controller
 {
 
     /**
@@ -17,7 +17,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        return Projects::query()->whereHas('output', function ($q) {
+        return Projects::query()->with('output')->whereHas('output', function ($q) {
             $q->where('user', Auth::user()->id);
         })
             ->get();
@@ -63,7 +63,9 @@ class ProjectController extends Controller
             'status' => 'error'
         ];
 
-        $project = Projects::query()->with('output')->find(request('id'));
+        $project = Projects::query()->with('output')
+            ->with('inputs')
+            ->find(request('id'));
 
         if ($project) {
             $result['status'] = 'success';

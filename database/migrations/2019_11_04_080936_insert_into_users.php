@@ -33,7 +33,7 @@ class InsertIntoUsers extends Migration
             'user' => 1
         ]);
         
-        DB::table('project')->insert([
+        DB::table('projects')->insert([
             'id' => 1,
             'output' => 1,
         ]);

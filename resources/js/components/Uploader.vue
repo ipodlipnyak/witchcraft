@@ -1,7 +1,5 @@
 <template>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
+<div class="container"><div class="row justify-content-center"><div class="col-md-8">
             
   <b-button v-if="filesUploaded.length > 0" block squared v-b-toggle.uploaded-files variant="primary">Uploaded files</b-button>
   <b-collapse v-if="filesUploaded.length > 0" id="uploaded-files" class="mt-2">
@@ -71,11 +69,9 @@
       <b-button squared v-if="files.length > 0" v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" variant="danger">Stop upload</b-button>
     </b-button-group>
 
-            </div>
-        </div>
-    </div>
-    
- 
+            
+        
+</div></div></div>
 </template>
 
 <script>

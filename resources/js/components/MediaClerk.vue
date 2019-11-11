@@ -12,7 +12,8 @@
         	<section class="slider">
             	<div class="slider__list" ref="list"  v-pan="onPan">
                 	<div v-for="(slide, index) in slides" :key="slide.label" class="slider__item flex-column">
-                    	<component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component" class="slider-content"></component>
+                    	<component v-if="slide == activeSlide" :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component" class="slider-content"></component>
+                    	<div v-else></div>
                 	</div>
             	</div>
         	</section>
