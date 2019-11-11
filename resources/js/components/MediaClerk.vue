@@ -1,46 +1,57 @@
 <template>
-<section class="slider">
-<div class="slider__list" ref="list"  v-pan="onPan">
-	<div v-for="(slide, index) in slides" :key="slide.label"
-		v-tap="(e) => onTap(e, slide)"
-		class="slider__item"
-		>
-		<component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component"></component>
-	</div>
-</div>
-</section>
+    <div>
+        <b-navbar id="nav-header" type="info" variant="dark">
+        	<b-navbar-nav>
+        		<b-nav-item v-for="(slide, index) in slides" :key="slide.label" href="#" v-tap="(e) => goToSlide(e, slide)"
+        		v-bind:class="[slide == activeSlide ? 'active' : '']">
+        		<p>{{ slide.label }}</p>
+        		</b-nav-item>
+        	</b-navbar-nav>
+        </b-navbar>
+        <main>
+        <section class="slider">
+            <div class="slider__list" ref="list"  v-pan="onPan">
+                <div v-for="(slide, index) in slides" :key="slide.label" class="slider__item">
+                    <component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component"></component>
+                </div>
+            </div>
+        </section>
 
+        </main>
+    </div>
 </template>
+
 
 <script>
 
-jQuery.expr.filters.offscreen = function(el) {
-	  var rect = el.getBoundingClientRect();
-	  return (
-	           (rect.x + rect.width) < 0 
-	             || (rect.y + rect.height) < 0
-	             || (rect.x > window.innerWidth || rect.y > window.innerHeight)
-	         );
-	};
+// jQuery.expr.filters.offscreen = function(el) {
+// 	  var rect = el.getBoundingClientRect();
+// 	  return (
+// 	           (rect.x + rect.width) < 0 
+// 	             || (rect.y + rect.height) < 0
+// 	             || (rect.x > window.innerWidth || rect.y > window.innerHeight)
+// 	         );
+// 	};
 	
-window.checkOverflow = function (el)
-	{
-	   var curOverflow = el.style.overflow;
+// window.checkOverflow = function (el)
+// 	{
+// 	   var curOverflow = el.style.overflow;
 
-	   if ( !curOverflow || curOverflow === "visible" )
-	      el.style.overflow = "hidden";
+// 	   if ( !curOverflow || curOverflow === "visible" )
+// 	      el.style.overflow = "hidden";
 
-	   var isOverflowing = el.clientWidth < el.scrollWidth 
-	      || el.clientHeight < el.scrollHeight;
+// 	   var isOverflowing = el.clientWidth < el.scrollWidth 
+// 	      || el.clientHeight < el.scrollHeight;
 
-	   el.style.overflow = curOverflow;
+// 	   el.style.overflow = curOverflow;
 
-	   return isOverflowing;
-	}
+// 	   return isOverflowing;
+// 	}
 
 
 // import VueScrollSnap from 'vue-scroll-snap'
 
+import { NavbarPlugin } from 'bootstrap-vue'
 import Uploader from './Uploader'
 import Projects from './Projects'
 
@@ -49,6 +60,7 @@ import VueScrollactive from 'vue-scrollactive'
 
 import {TweenMax} from "gsap/TweenMax";
 
+Vue.use(NavbarPlugin)
 Vue.use(VueScrollactive)
 
 
@@ -66,11 +78,9 @@ Vue.use(VueScrollactive)
 		    			label: 'projects',
 		    			component: 'projects'
 		    		},
-		    		{
-		    			label: 'dumdum',
-		    			component: 'projects'
-		    		},
 		    	],
+		    	
+		    	activeSlide: '',
 		      
 		      currentOffset: 0,
 		      colors: [
@@ -127,7 +137,7 @@ Vue.use(VueScrollactive)
 		},
 		
 		beforeMount() {
-			//
+			this.activeSlide = this.slides[0];
 		},
 		
 		created() {
@@ -190,8 +200,12 @@ Vue.use(VueScrollactive)
         		    
         		  }
         	},
-        	onTap: function() {
-        		console.log('tap');
+        	goToSlide: function(e, slide) {
+        		let target = e.target.nodeName == "P" ? e.target : e.target.firstChild;
+        		if (slide) {
+        			TweenMax.to(target, 0.12, { scale: 1.1, yoyo: true, repeat: 1, ease: Sine.easeOut});
+        			this.activeSlide = slide;
+        		}
         	},
             handleScroll () {
             	console.log('swoop');

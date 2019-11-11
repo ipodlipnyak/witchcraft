@@ -5,7 +5,9 @@
 @import 'variables';
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+/* @import '~bootstrap/scss/bootstrap'; */
+@import 'node_modules/bootstrap/scss/bootstrap';
+@import 'node_modules/bootstrap-vue/src/index.scss';
 
 *:focus {
     outline: none;
@@ -17,4 +19,36 @@
 
 #app {
 	overflow: hidden;
+}
+
+.navbar {
+    padding: 0;
+}
+
+%nav-item {
+	border-right: 2px solid #2a2a2e;
+	
+	.nav-link {
+		padding: 1rem;
+		color: #979a9d;
+		
+		p {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
+}
+
+.nav {
+	&-item {
+		@extend %nav-item;
+	}
+	
+	&-item.active {
+		@extend %nav-item;
+		.nav-link {
+			color: #fff;
+			box-shadow: 0px -5px 0px -2px white inset;
+		}
+	}
 }
