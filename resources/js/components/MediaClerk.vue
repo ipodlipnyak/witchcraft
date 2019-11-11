@@ -9,18 +9,16 @@
         	</b-navbar-nav>
         </b-navbar>
         <main>
-        <section class="slider">
-            <div class="slider__list" ref="list"  v-pan="onPan">
-                <div v-for="(slide, index) in slides" :key="slide.label" class="slider__item">
-                    <component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component"></component>
-                </div>
-            </div>
-        </section>
-
+        	<section class="slider">
+            	<div class="slider__list" ref="list"  v-pan="onPan">
+                	<div v-for="(slide, index) in slides" :key="slide.label" class="slider__item">
+                    	<component :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component"></component>
+                	</div>
+            	</div>
+        	</section>
         </main>
     </div>
 </template>
-
 
 <script>
 
@@ -28,16 +26,11 @@ import { NavbarPlugin } from 'bootstrap-vue'
 import Uploader from './Uploader'
 import Projects from './Projects'
 
-import VueScrollSnap from './VueScrollSnap'
-import VueScrollactive from 'vue-scrollactive'
-
 import {TweenMax} from "gsap/TweenMax";
 
 Vue.use(NavbarPlugin)
 
-
-
-    export default {
+export default {
 		props: ['apiToken'],
 	  	data: function () {
 		    return {
@@ -50,24 +43,9 @@ Vue.use(NavbarPlugin)
 		    			label: 'projects',
 		    			component: 'projects'
 		    		},
-		    		{
-		    			label: 'dumdum',
-		    			component: 'projects'
-		    		},
 		    	],
 		    	
 		      currentOffset: 0,
-		      colors: [
-					"#F7CC45",
-					"#AC6909",
-					"#272625",
-					"#FFAD01",
-					"#81DC58",
-					"#C68E71",
-					"#F2B2BD",
-					"#FFCB00",
-					"#BE9763"
-		      ],
 		      
 		      activeSlide: '',
 		    }
@@ -99,23 +77,14 @@ Vue.use(NavbarPlugin)
 		components: {
 			Uploader,
 			Projects,
-			VueScrollSnap
 		},
 		
 		beforeMount() {
 			this.activeSlide = this.slides[0];
 		},
 		
-		created() {
-			window.addEventListener("scroll", this.handleScroll)
-		},
-		
         mounted() {
 			//
-        },
-        
-        destroyed () {
-        	window.removeEventListener("scroll", this.handleScroll)
         },
         
         watch: {
@@ -185,7 +154,7 @@ Vue.use(NavbarPlugin)
         	},
         	
         	selectSlide: function(e, slideIndex) {
-        		let slide = this.slides[slideIndex]; 
+        		let slide = this.slides[slideIndex];
         		let target = e.target.nodeName == "P" ? e.target : e.target.firstChild;
         		if (slide) {
         			TweenMax.to(target, 0.12, { scale: 1.1, yoyo: true, repeat: 1, ease: Sine.easeOut});
@@ -194,11 +163,8 @@ Vue.use(NavbarPlugin)
         		
         		this.goToSlide(this.slidesOffsets[slideIndex])
         	},
-            handleScroll () {
-            	console.log('swoop');
-            },
     	}
-	}
+}
 </script>
 
 <style lang='scss' scoped>
