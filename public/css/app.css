@@ -11108,3 +11108,7 @@ a.text-dark:focus {
   border-radius: 0;
 }
 
+#app {
+  overflow: hidden;
+}
+

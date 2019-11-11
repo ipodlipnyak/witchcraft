@@ -214,20 +214,25 @@ Vue.use(VueScrollactive)
   }
   
   .slider {
-	width: 100%;
+  /*
 	height: 120px;
+	*/
+	width: 100%;
 	overflow: visible;
-  position: relative;
-  white-space: nowrap;
+  	position: relative;
+  	white-space: nowrap;
 
 	&__list {
 		display: flex;
 		flex: 1;
 		width: 100%;
 		height: 100%;
+		/*
 		font-size: 2rem;
+		*/
 		backface-visibility: hidden;
 		transform: translateX(calc(var(--x, 0) * 1%));
+		
 	}
 	
 	&__item {
@@ -243,15 +248,19 @@ Vue.use(VueScrollactive)
 		box-sizing: border-box;
 		
 		border-radius: 8px;
+		/*
 		text-align: center;
   		transition: opacity 0.15s ease;
 		color: #fff;
+		*/
 
 		&:focus {
 			opacity: 0.8;
 		}
+		
 	}
 }
+
   /*
   .slider__list {
   		display: flex;
