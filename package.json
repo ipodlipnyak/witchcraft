@@ -32,8 +32,6 @@
         "bootstrap-vue": "^2.0.4",
         "gsap": "^2.1.3",
         "hammerjs": "^2.0.8",
-        "vue-scroll-snap": "^0.1.6",
-        "vue-scrollactive": "^0.8.0",
         "vue-upload-component": "^2.8.20"
     }
 }

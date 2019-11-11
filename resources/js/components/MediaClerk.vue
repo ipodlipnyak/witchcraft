@@ -24,33 +24,6 @@
 
 <script>
 
-// jQuery.expr.filters.offscreen = function(el) {
-// 	  var rect = el.getBoundingClientRect();
-// 	  return (
-// 	           (rect.x + rect.width) < 0 
-// 	             || (rect.y + rect.height) < 0
-// 	             || (rect.x > window.innerWidth || rect.y > window.innerHeight)
-// 	         );
-// 	};
-	
-// window.checkOverflow = function (el)
-// 	{
-// 	   var curOverflow = el.style.overflow;
-
-// 	   if ( !curOverflow || curOverflow === "visible" )
-// 	      el.style.overflow = "hidden";
-
-// 	   var isOverflowing = el.clientWidth < el.scrollWidth 
-// 	      || el.clientHeight < el.scrollHeight;
-
-// 	   el.style.overflow = curOverflow;
-
-// 	   return isOverflowing;
-// 	}
-
-
-// import VueScrollSnap from 'vue-scroll-snap'
-
 import { NavbarPlugin } from 'bootstrap-vue'
 import Uploader from './Uploader'
 import Projects from './Projects'
@@ -61,7 +34,6 @@ import VueScrollactive from 'vue-scrollactive'
 import {TweenMax} from "gsap/TweenMax";
 
 Vue.use(NavbarPlugin)
-Vue.use(VueScrollactive)
 
 
 
@@ -118,38 +90,8 @@ Vue.use(VueScrollactive)
 			itemWidth() {
 				return this.$refs.list.scrollWidth / this.slides.length;
 			},
-// 			selectedContent() {
-// 				if (this.selected) {
-// 					return this.emojis[this.slides.indexOf(this.selected)];
-// 				}
-// 				return "";
-// 			},
 			count() {
 				return this.slides.length;
-			},
-			
-			
-// 			activeSlide() {
-// 				let self = this;
-// 				return self.slides.find(function(el) {
-// 					let index = self.slides.indexOf(el);
-// 					return self.currentOffset == self.slidesOffsets[index];
-// 				});
-// 			},
-			
-			fuck: function() {
-// 				var result = false;
-// 				let container = $('.scroll-snap-container');
-// 				let container_width = container.parent().width();
-// 				container.find('.item').each(function(i) {
-// 					if ((container_width / 2) < Math.abs($(this).position().left)) {
-// 						result = $(this);
-// 					}
-// 				});
-// 				return result;
-// 				$('#fuck1').parent().width();
-				return Math.abs($('#fuck1').position().left);
-// 				return $('#fuck1').is(':visible');
 			},
 		},
 
@@ -225,17 +167,6 @@ Vue.use(VueScrollactive)
         		    }
         		    
         		    this.goToSlide(finalOffset);
-
-        		    // animate it!
-//         		    TweenMax.fromTo(this.$refs.list, 0.5,
-//         		      { '--x': this.currentOffset },
-//         		      { '--x': finalOffset,
-//         		        ease: Elastic.easeOut.config(1, 0.8),
-//         		        onComplete: () => {
-//         		          this.currentOffset = finalOffset;
-//         		        }
-//         		      }
-//         		    );
         		    
         		  }
         	},
@@ -272,21 +203,15 @@ Vue.use(VueScrollactive)
 
 <style lang='scss' scoped>
   .item {
-    /* Set the minimum height of the items to be the same as the height of the scroll-snap-container.*/
     min-width: 100%;
-/*     flex: 0 0 100%; */
   }
  
   .scroll-snap-container {
     height: 250px;
-/*     width: 500px; */
     flex: 0 0 100%;
   }
   
   .slider {
-  /*
-	height: 120px;
-	*/
 	width: 100%;
 	overflow: visible;
   	position: relative;
@@ -297,9 +222,6 @@ Vue.use(VueScrollactive)
 		flex: 1;
 		width: 100%;
 		height: 100%;
-		/*
-		font-size: 2rem;
-		*/
 		backface-visibility: hidden;
 		transform: translateX(calc(var(--x, 0) * 1%));
 		
@@ -318,11 +240,6 @@ Vue.use(VueScrollactive)
 		box-sizing: border-box;
 		
 		border-radius: 8px;
-		/*
-		text-align: center;
-  		transition: opacity 0.15s ease;
-		color: #fff;
-		*/
 
 		&:focus {
 			opacity: 0.8;
@@ -330,71 +247,4 @@ Vue.use(VueScrollactive)
 		
 	}
 }
-
-  /*
-  .slider__list {
-  		display: flex;
-  		flex: 1;
- 		width: 100%;
- 		height: 100%;
- 		min-height: 100%;
-		overflow: visible;
-  		transform: translateX(calc(var(--x, 0) * 1%));
-  		backface-visibility: hidden;
-  		padding-left: 0px;
-  		white-space: nowrap;
-  }
-  
-  .slider__item {
-  		position: relative;
-  		flex: 0 0 100%;
-  		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100%;
- 		margin-right: 12px; 
- 		padding: 6px; 
-  }
-  */
-/*  
-.slider {
-	width: 100%;
-	height: 120px;
-	overflow: visible;
-  position: relative;
-  white-space: nowrap;
-
-	&__list {
-		display: flex;
-		width: 100%;
-		height: 100%;
-		
-		font-size: 2rem;
-		backface-visibility: hidden;
-		transform: translateX(calc(var(--x, 0) * 1%));
-	}
-	
-	&__item {
-		position: relative;
-		flex: 0 0 140px;
-		
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100%;
-		margin-right: 12px;
-		padding: 6px;
-		box-sizing: border-box;
-		
-		border-radius: 8px;
-		text-align: center;
-  	transition: opacity 0.15s ease;
-		color: #fff;
-
-		&:focus {
-			opacity: 0.8;
-		}
-	}
-}
-*/
 </style>
