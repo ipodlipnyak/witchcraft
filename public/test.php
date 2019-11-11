@@ -7,6 +7,8 @@ use App\MediaFiles;
 use Symfony\Component\HttpFoundation\File\File;
 use App\UploadSessions;
 use Illuminate\Support\Facades\DB;
+use App\Project;
+use Illuminate\Support\Facades\Auth;
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
@@ -17,12 +19,26 @@ $app->make(Kernel::class)->bootstrap();
 
 DB::enableQueryLog();
 
-$result = MediaFiles::query()->with('UploadSession')->find(40);
+// $result = MediaFiles::query()->with('UploadSession')->find(40);
+
+// $o = new MediaFiles();
+// $o->name = 'test';
+// $o->user = 1;
+// $o->save();
+
+// $p = new Project();
+// $p->output = $o->id;
+// $p->save();
+
+$result = Project::query()->with('inputs')->get();
+
+// $result = Project::query()->whereHas('output', function($q){
+//     $q->where('user',1);
+// })->get();
 // $result = $media->uploadSession();
 
 $log = DB::getQueryLog();
 
-$result = config('app.name');
 
 response()->json([
     'result' => $result,

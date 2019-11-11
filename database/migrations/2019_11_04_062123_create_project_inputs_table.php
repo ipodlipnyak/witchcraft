@@ -21,7 +21,7 @@ class CreateProjectInputsTable extends Migration
             $table->timestamps();
             
             $table->foreign('project')->references('id')->on('projects');
-            $table->foreign('media_file')->references('id')->on('media_files');
+            $table->foreign('media_file')->references('id')->on('media_files')->onDelete('restrict');
         });
     }
 

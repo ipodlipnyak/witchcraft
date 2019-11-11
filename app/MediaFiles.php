@@ -37,7 +37,9 @@ class MediaFiles extends Model
     }
     
     /**
-     * Get all of the posts for the user.
+     * upload session relation
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function uploadSession()
     {

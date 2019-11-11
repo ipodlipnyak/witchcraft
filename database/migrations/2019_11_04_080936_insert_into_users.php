@@ -17,10 +17,25 @@ class InsertIntoUsers extends Migration
     public function up()
     {
         DB::table('users')->insert([
+            'id' => 1,
             'name' => 'test',
             'email' => 'test@test.test',
             'password' => Hash::make('1'),
             'api_token' => Str::random(60),
+        ]);
+        
+        DB::table('media_files')->insert([
+            'id' => 1,
+            'storage_path' => 'output',
+            'storage_disk' => 'files',
+            'name_to_display' => 'demoOutput',
+            'name' => 'demo.mkv',
+            'user' => 1
+        ]);
+        
+        DB::table('project')->insert([
+            'id' => 1,
+            'output' => 1,
         ]);
     }
 
