@@ -3,7 +3,11 @@
 
 <div v-if="projectSelected || projectSelected === 0">
 	<b-button block squared @click="selectProject('')" variant="primary">Close</b-button>
-	{{ projectSelected }}
+	<project-inputs ref="inputs" 
+		v-if="projectSelected" 
+		:api-token="apiToken" 
+		:project-id="projectSelected.id">
+	</project-inputs>
 </div>
 
 <div v-else>
@@ -22,6 +26,8 @@
 </template>
 
 <script>
+import ProjectInputs from './ProjectInputs';
+
 export default {
 	props: ['apiToken'],
 	data: function () {
@@ -32,6 +38,10 @@ export default {
 			projectSelected: '',
 			}
 		},
+		
+	components: {
+		ProjectInputs,
+	},
 		
 	mounted() {
 		this.getFiles();
@@ -65,6 +75,7 @@ export default {
     		self = this;
     		
     		if (id > 0) {
+    			this.$emit('lock-swipe');
         		axios.get('/api/projects/' + id + '?api_token=' + this.apiToken)
         		.then(function (response) {
         			if (response.data.status == 'success') {
@@ -74,7 +85,11 @@ export default {
         		.catch(function (error) {
         			console.log(error);
         		});
+    		} else if (id === 0) {
+    			this.$emit('lock-swipe');
+    			self.projectSelected = id;
     		} else {
+    			this.$emit('unlock-swipe');
     			self.projectSelected = id;
     		}
     	},

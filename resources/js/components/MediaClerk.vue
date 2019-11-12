@@ -12,7 +12,15 @@
         	<section class="slider">
             	<div class="slider__list" ref="list"  v-pan="onPan">
                 	<div v-for="(slide, index) in slides" :key="slide.label" class="slider__item flex-column">
-                    	<component v-if="slide == activeSlide" :ref="slide.label" :api-token="apiToken" v-bind:is="slide.component" class="slider-content"></component>
+                    	<component 
+                    		v-on:lock-swipe="unlockSwipe = false" 
+                    		v-on:unlock-swipe="unlockSwipe = true" 
+                    		v-if="slide == activeSlide" 
+                    		:ref="slide.label" 
+                    		:api-token="apiToken" 
+                    		v-bind:is="slide.component" 
+                    		class="slider-content">
+                    	</component>
                     	<div v-else></div>
                 	</div>
             	</div>
@@ -35,6 +43,7 @@ export default {
 		props: ['apiToken'],
 	  	data: function () {
 		    return {
+		    	unlockSwipe: true,
 		    	slides: [
 		    		{
 		    			label: 'uploader',
@@ -107,6 +116,7 @@ export default {
         
         methods: {
         	onPan: function(e) {
+        		if (this.unlockSwipe) {
         		  // how far the slider has been dragged in percentage of the visible container
         		  const dragOffset = 100 / this.itemWidth * e.deltaX / this.slides.length * this.overflowRatio;
 
@@ -139,6 +149,7 @@ export default {
         		    this.goToSlide(finalOffset);
         		    
         		  }
+        		}
         	},
         	
         	goToSlide: function(finalOffset) {

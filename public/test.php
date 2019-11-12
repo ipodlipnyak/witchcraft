@@ -9,6 +9,7 @@ use App\UploadSessions;
 use Illuminate\Support\Facades\DB;
 use App\Projects;
 use Illuminate\Support\Facades\Auth;
+use App\ProjectInputs;
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
@@ -30,8 +31,22 @@ DB::enableQueryLog();
 // $p->output = $o->id;
 // $p->save();
 
-$result = Projects::query()->with('inputs')->get();
+// $result = Projects::query()->with('inputs')->get();
 
+$project = Projects::query()->with('inputs')->find(1);
+// $result = $result['inputs']->pluck('id');
+
+/* @var $input MediaFiles */
+foreach ($project['inputs'] as &$input) {
+//     $input->query()->addSelect
+    $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
+    ->where('media_file', $input['id'])
+    ->value('priority');
+}
+
+$result = $project['inputs']->sortByDesc('priority')->all();
+
+// $result = array_column($result['inputs']->toArray(), 'id');
 // $result = Project::query()->whereHas('output', function($q){
 //     $q->where('user',1);
 // })->get();

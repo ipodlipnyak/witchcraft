@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Projects;
 use Illuminate\Support\Facades\Auth;
 use App\MediaFiles;
+use App\ProjectInputs;
+use phpDocumentor\Reflection\Project;
 
 class ProjectsController extends Controller
 {
@@ -17,7 +19,8 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        return Projects::query()->with('output')->whereHas('output', function ($q) {
+        return Projects::query()->with('output')
+            ->whereHas('output', function ($q) {
             $q->where('user', Auth::user()->id);
         })
             ->get();
@@ -54,10 +57,9 @@ class ProjectsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
         $result = [
             'status' => 'error'
@@ -67,11 +69,64 @@ class ProjectsController extends Controller
             ->with('inputs')
             ->find(request('id'));
 
+        foreach ($project['inputs'] as &$input) {
+            $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
+                ->where('media_file', $input['id'])
+                ->value('priority');
+        }
+
         if ($project) {
             $result['status'] = 'success';
             $result['project'] = $project;
         }
 
+        return response()->json($result);
+    }
+
+    /**
+     * Get available files for specified project
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getAvailableFiles()
+    {
+        $result = [
+            'status' => 'error'
+        ];
+        
+        $poject = Projects::query()->with('inputs')->find(request('id'));
+        $files = MediaFiles::query()->where('user',Auth::user()->id)->whereKeyNot($poject['inputs']->pluck('id'))->get();
+        
+        if ($files) {
+            $result['status'] = 'success';
+            $result['files'] = $files;
+        }
+        
+        return response()->json($result);
+    }
+    
+    public function getInputs() {
+        $result = [
+            'status' => 'error'
+        ];
+        
+        $poject = Projects::query()->with('inputs')->find(request('id'));
+        
+        foreach ($project['inputs'] as &$input) {
+            $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
+            ->where('media_file', $input['id'])
+            ->value('priority');
+        }
+        
+        // @TODO sort not working
+        $files = $poject['inputs']->sortBy('priority');
+
+        
+        if ($files) {
+            $result['status'] = 'success';
+            $result['files'] = $files;
+        }
+        
         return response()->json($result);
     }
 
