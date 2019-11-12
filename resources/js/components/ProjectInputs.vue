@@ -1,42 +1,53 @@
 <template>
-<div class="row">
+<div class="row pt-4">
 	<div class="col-6">
-		<draggable
-        	v-model="inputs"
-        	v-bind="dragOptions"
-        	class="list-group"
-        	ghost-class="ghost"
-        	@start="drag = true"
-        	@end="drag = false"
-        	tag="ul">
-			<transition-group type="transition" :name="!drag ? 'flip-list' : null">
-        		<li
-          			class="list-group-item"
-          			v-for="input in inputs"
-          			:key="input.id">
-          			{{ input.name }}
-        		</li>
-      		</transition-group>
-		</draggable>
+		<div class="card">
+			<div class="card-header">
+			Inputs
+			</div>
+			<draggable
+        		v-model="inputs"
+        		v-bind="dragOptions"
+        		class="list-group"
+        		ghost-class="ghost"
+        		@start="drag = true"
+        		@end="drag = false"
+        		tag="div">
+				<transition-group type="transition" :name="!drag ? 'flip-list' : null">
+        			<div
+          				class="list-group-item"
+          				v-for="input in inputs"
+          				:key="input.id">
+          				{{ input.name }}
+        			</div>
+      			</transition-group>
+			</draggable>
+		</div>
+
 	</div>
 	<div class="col-6">
-		<draggable
-        	v-model="filesUploaded"
-        	v-bind="dragOptions"
-        	class="list-group"
-        	ghost-class="ghost"
-        	@start="drag = true"
-        	@end="drag = false"
-        	tag="ul">
-			<transition-group type="transition" :name="!drag ? 'flip-list' : null">
-        		<li
-          			class="list-group-item"
-          			v-for="file in filesUploaded"
-          			:key="file.id">
-          			{{ file.name }}
-        		</li>
-      		</transition-group>
-		</draggable>
+		<div class="card">
+			<div class="card-header">
+			Uploaded files
+			</div>
+			<draggable
+        		v-model="filesUploaded"
+        		v-bind="dragOptions"
+        		class="list-group"
+        		ghost-class="ghost"
+        		@start="drag = true"
+        		@end="drag = false"
+        		tag="div">
+				<transition-group type="transition" :name="!drag ? 'flip-list' : null">
+        			<div
+          				class="list-group-item"
+          				v-for="file in filesUploaded"
+          				:key="file.id">
+          				{{ file.name }}
+        			</div>
+      			</transition-group>
+			</draggable>
+		</div>
 	</div>
 </div>
 </template>

@@ -110,7 +110,7 @@ class ProjectsController extends Controller
             'status' => 'error'
         ];
         
-        $poject = Projects::query()->with('inputs')->find(request('id'));
+        $project = Projects::query()->with('inputs')->find(request('id'));
         
         foreach ($project['inputs'] as &$input) {
             $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
@@ -118,9 +118,7 @@ class ProjectsController extends Controller
             ->value('priority');
         }
         
-        // @TODO sort not working
-        $files = $poject['inputs']->sortBy('priority');
-
+        $files = $project['inputs']->sortBy('priority')->values()->all();
         
         if ($files) {
             $result['status'] = 'success';

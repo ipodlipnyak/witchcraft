@@ -44,7 +44,7 @@ foreach ($project['inputs'] as &$input) {
     ->value('priority');
 }
 
-$result = $project['inputs']->sortByDesc('priority')->all();
+$result = $project['inputs']->sortBy('priority')->values()->all();
 
 // $result = array_column($result['inputs']->toArray(), 'id');
 // $result = Project::query()->whereHas('output', function($q){
