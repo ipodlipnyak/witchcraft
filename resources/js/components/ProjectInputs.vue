@@ -124,7 +124,7 @@ export default {
         			console.log(error);
         		});
     		} else {
-        		axios.get('/api/files?api_token=' + this.apiToken)
+        		axios.get('/api/projects/files?api_token=' + this.apiToken)
         		.then(function (response) {
         			if (response.data.status == 'success') {
         				self.filesUploaded = response.data.files;

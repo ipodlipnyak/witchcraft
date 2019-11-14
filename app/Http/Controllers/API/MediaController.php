@@ -24,7 +24,8 @@ class MediaController extends Controller
             'status' => 'error'
         ];
 
-        $files = MediaFiles::query()->with('UploadSession')
+        $files = MediaFiles::query()
+            ->with('UploadSession')
             ->where('user', Auth::user()->id)
             ->where('start_offset', null)
             ->where('storage_path', 'media')

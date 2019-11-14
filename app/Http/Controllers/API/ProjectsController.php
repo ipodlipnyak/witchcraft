@@ -39,26 +39,26 @@ class ProjectsController extends Controller
         $result = [
             'status' => 'error'
         ];
-        
+
         $project = new Projects();
         $project->save();
 
         $output = new MediaFiles();
-        
+
         $user_id = Auth::user()->id;
         $suffix = Str::random(5);
         $extension = $request->get('extension');
         $output->name = "{$user_id}_{$project->id}_{$suffix}.{$extension}";
-        
+
         $output->user = $user_id;
         $output->width = $request->get('width');
         $output->height = $request->get('height');
         $output->label = $request->get('label');
-        
+
         if ($output->save()) {
             $project->output = $output->id;
             $project->save();
-            
+
             if ($project->id) {
                 $result['status'] = 'success';
                 $result['id'] = $project->id;
@@ -109,57 +109,86 @@ class ProjectsController extends Controller
         $result = [
             'status' => 'error'
         ];
-        
+
         $project = Projects::query()->with('inputs')->find(request('id'));
         $files_to_skip = $project['inputs']->pluck('id')->toArray();
         array_push($files_to_skip, $project['output']);
-        $files = MediaFiles::query()->where('user',Auth::user()->id)->whereKeyNot($files_to_skip)->get();
-        
+        $files = MediaFiles::query()->where('user', Auth::user()->id)
+            ->whereKeyNot($files_to_skip)
+            ->get();
+
         if ($files) {
             $result['status'] = 'success';
             $result['files'] = $files;
         }
-        
+
         return response()->json($result);
     }
-    
+
+    /**
+     * Get all available files for new project
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getAvailableFilesAll()
+    {
+        $result = [
+            'status' => 'error'
+        ];
+
+        $files = MediaFiles::query()->where('user', Auth::user()->id)
+            ->where('start_offset', null)
+            ->get();
+
+        if ($files) {
+            $result['status'] = 'success';
+            $result['files'] = $files;
+        }
+
+        return response()->json($result);
+    }
+
     /**
      * Get project's inputs
      *
      * @return \Illuminate\Http\Response
      */
-    public function getInputs() {
+    public function getInputs()
+    {
         $result = [
             'status' => 'error'
         ];
-        
+
         $project = Projects::query()->with('inputs')->find(request('id'));
-        
+
         foreach ($project['inputs'] as &$input) {
             $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
-            ->where('media_file', $input['id'])
-            ->value('priority');
+                ->where('media_file', $input['id'])
+                ->value('priority');
         }
-        
-        $files = $project['inputs']->sortBy('priority')->values()->all();
-        
+
+        $files = $project['inputs']->sortBy('priority')
+            ->values()
+            ->all();
+
         if ($files) {
             $result['status'] = 'success';
             $result['files'] = $files;
         }
-        
+
         return response()->json($result);
     }
-    
+
     /**
      * Update project's inputs
      *
      * @return \Illuminate\Http\Response
      */
-    public function updateInputs() {
+    public function updateInputs()
+    {
         $project_id = request('id');
         ProjectInputs::query()->where('project', $project_id)->delete();
-        
+
         foreach (request('inputs') as $key => $id) {
             $input = new ProjectInputs();
             $input->project = $project_id;
@@ -167,11 +196,11 @@ class ProjectsController extends Controller
             $input->priority = $key;
             $input->save();
         }
-        
+
         $result = [
             'status' => 'success'
         ];
-        
+
         return response()->json($result);
     }
 
@@ -185,31 +214,33 @@ class ProjectsController extends Controller
         $result = [
             'status' => 'error'
         ];
-        
+
         /* @var $project Projects */
         $project = Projects::query()->find(request('id'));
-        $output = $project->output()->get()->first();
+        $output = $project->output()
+            ->get()
+            ->first();
         if ($output) {
             $output->label = request('label');
             $output->width = request('width');
             $output->height = request('height');
-            
+
             $new_extension = request('extension');
             if ($new_extension) {
-                $new_output_name = preg_replace('/\.[^.]+$/', '.', $output->name).$new_extension;
-                
+                $new_output_name = preg_replace('/\.[^.]+$/', '.', $output->name) . $new_extension;
+
                 if (Storage::disk($output->storage_disk)->exists("{$output->storage_path}/{$output->name}")) {
                     Storage::disk($output->storage_disk)->move("{$output->storage_path}/{$output->name}", "{$output->storage_path}/{$new_output_name}");
                 }
-                
+
                 $output->name = $new_output_name;
             }
-            
+
             if ($output->save()) {
                 $result['status'] = 'success';
             }
         }
-        
+
         return response()->json($result);
     }
 

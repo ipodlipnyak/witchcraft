@@ -176,6 +176,7 @@ export default {
     			if (response.data.status == 'success') {
     				self.$refs.inputs.saveInputs(response.data.id);
         			self.getProjects();
+        			self.selectProject(response.data.id);
     			}
     		})
     		.catch(function (error) {
