@@ -3,6 +3,12 @@
 
 <div v-if="projectSelected || projectSelected === 0">
 	<b-button block squared @click="selectProject('')" variant="primary">Close</b-button>
+	
+	<b-input-group size="lg" prepend="Output file name">
+    	<b-form-input>
+    	</b-form-input>
+	</b-input-group>
+	
 	<project-inputs ref="inputs" 
 		v-if="projectSelected" 
 		:api-token="apiToken" 
@@ -27,6 +33,9 @@
 
 <script>
 import ProjectInputs from './ProjectInputs';
+import { InputGroupPlugin } from 'bootstrap-vue';
+
+Vue.use(InputGroupPlugin)
 
 export default {
 	props: ['apiToken'],

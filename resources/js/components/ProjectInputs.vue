@@ -79,7 +79,17 @@ export default {
 				disabled: false,
 				ghostClass: "ghost"
 			};
-		}
+		},
+		
+		inputOrder() {
+			let result = [];
+			
+			this.inputs.forEach(function(el, i) {
+				result.push(el.id);
+			});
+			
+			return result;
+		},
 	},
 	
 	mounted() {
@@ -89,7 +99,7 @@ export default {
 	
 	methods: {
 		getFiles: function() {
-    		self = this;
+    		let self = this;
     		axios.get('/api/projects/' + this.projectId + '/files?api_token=' + this.apiToken)
     		.then(function (response) {
     			if (response.data.status == 'success') {
@@ -102,11 +112,26 @@ export default {
     	},
     	
 		getInputs: function() {
-    		self = this;
+    		let self = this;
     		axios.get('/api/projects/' + this.projectId + '/inputs?api_token=' + this.apiToken)
     		.then(function (response) {
     			if (response.data.status == 'success') {
     				self.inputs = response.data.files;
+    			}
+    		})
+    		.catch(function (error) {
+    			console.log(error);
+    		});
+    	},
+    	
+    	saveInputs: function () {
+    		let self = this;
+    		axios.post('/api/projects/' + this.projectId + '/inputs?api_token=' + this.apiToken, {
+    			inputs: self.inputOrder
+    		})
+    		.then(function (response) {
+    			if (response.data.status == 'success') {
+    				//
     			}
     		})
     		.catch(function (error) {

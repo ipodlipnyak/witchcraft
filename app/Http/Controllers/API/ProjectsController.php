@@ -105,6 +105,11 @@ class ProjectsController extends Controller
         return response()->json($result);
     }
     
+    /**
+     * Get project's inputs
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function getInputs() {
         $result = [
             'status' => 'error'
@@ -124,6 +129,30 @@ class ProjectsController extends Controller
             $result['status'] = 'success';
             $result['files'] = $files;
         }
+        
+        return response()->json($result);
+    }
+    
+    /**
+     * Update project's inputs
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function updateInputs() {
+        $project_id = request('id');
+        ProjectInputs::query()->where('project', $project_id)->delete();
+        
+        foreach (request('inputs') as $key => $id) {
+            $input = new ProjectInputs();
+            $input->project = $project_id;
+            $input->media_file = $id;
+            $input->priority = $key;
+            $input->save();
+        }
+        
+        $result = [
+            'status' => 'success'
+        ];
         
         return response()->json($result);
     }
