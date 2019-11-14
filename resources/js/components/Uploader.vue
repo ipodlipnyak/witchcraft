@@ -222,7 +222,9 @@ Vue.use(ButtonGroupPlugin)
         		self = this;
         		axios.get('/api/files?api_token=' + this.apiToken)
         		  .then(function (response) {
-        		    self.filesUploaded = response.data;
+        			  if (response.data.status == 'success') {
+        				  self.filesUploaded = response.data.files;
+        			  }
         		  })
         		  .catch(function (error) {
         		    console.log(error);

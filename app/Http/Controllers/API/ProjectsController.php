@@ -9,6 +9,7 @@ use App\MediaFiles;
 use App\ProjectInputs;
 use phpDocumentor\Reflection\Project;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProjectsController extends Controller
 {
@@ -38,18 +39,32 @@ class ProjectsController extends Controller
         $result = [
             'status' => 'error'
         ];
-
-        $output = new MediaFiles();
-        $output->name = $request->get('output');
-        $output->save();
-
+        
         $project = new Projects();
-        $project->output = $output->id;
         $project->save();
 
-        if ($project->id) {
-            $result['status'] = 'success';
-            $result['id'] = $project->id;
+        $output = new MediaFiles();
+        
+        $user_id = Auth::user()->id;
+        $suffix = Str::random(5);
+        $extension = $request->get('extension');
+        $output->name = "{$user_id}_{$project->id}_{$suffix}.{$extension}";
+        
+        $output->user = $user_id;
+        $output->width = $request->get('width');
+        $output->height = $request->get('height');
+        $output->label = $request->get('label');
+        
+        if ($output->save()) {
+            $project->output = $output->id;
+            $project->save();
+            
+            if ($project->id) {
+                $result['status'] = 'success';
+                $result['id'] = $project->id;
+            }
+        } else {
+            $project->delete();
         }
 
         return response()->json($result);

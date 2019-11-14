@@ -20,12 +20,22 @@ class MediaController extends Controller
      */
     public function index()
     {
-        $result = MediaFiles::query()->with('UploadSession')
+        $result = [
+            'status' => 'error'
+        ];
+
+        $files = MediaFiles::query()->with('UploadSession')
             ->where('user', Auth::user()->id)
             ->where('start_offset', null)
-            ->where('storage_path','media')
-            ->where('storage_disk','files')
+            ->where('storage_path', 'media')
+            ->where('storage_disk', 'files')
             ->get();
+
+        if ($files) {
+            $result['status'] = 'success';
+            $result['files'] = $files;
+        }
+        
         return response()->json($result);
     }
 

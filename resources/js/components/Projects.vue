@@ -7,40 +7,6 @@
 		<b-button squared @click="updateProject" variant="success" class="mb-4">Save</b-button>
 		<b-button squared @click="selectProject('')" variant="primary" class="mb-4">Close</b-button>
     </b-button-group>
-	
-	
-	<b-input-group size="md" prepend="Name">
-    	<b-form-input v-model="outputLabel"></b-form-input>
-		<b-input-group-append>
-			<b-button v-for="ext in fileExtensionsList"
-				:key="ext"
-				@click="outputFileExtension = ext" 
-				:variant="outputFileExtension == ext ? 'primary' : 'outline-primary'">
-				.{{ ext }}
-			</b-button>
-		</b-input-group-append>
-	</b-input-group>
-	
-	<b-input-group size="md" prepend="Ratio" class="pt-4">
-		<b-form-input v-model="aspectWidth"></b-form-input>
-		<b-form-input v-model="aspectHeight"></b-form-input>
-		<template v-slot:append>
-			<b-dropdown text="Presets" variant="primary">
-				<b-dropdown-item v-for="set in aspectPresets" 
-					:key="set.name" 
-					@click="selectPreset(set)">
-					{{ set.name }}
-				</b-dropdown-item>
-			</b-dropdown>
-    	</template>
-	</b-input-group>
-	
-	<project-inputs ref="inputs" 
-		v-if="projectSelected" 
-		:key="projectSelected.id ? projectSelected.id : 1"
-		:api-token="apiToken" 
-		:project-id="projectSelected.id">
-	</project-inputs>
 </div>
 
 <!-- New project -->
@@ -49,7 +15,9 @@
 		<b-button squared @click="saveProject" variant="success" class="mb-4">Save</b-button>
 		<b-button squared @click="selectProject('')" variant="primary" class="mb-4">Close</b-button>
     </b-button-group>
-	
+</div>
+
+<div v-if="projectSelected || projectSelected === 0">
 	<b-input-group size="md" prepend="Name">
     	<b-form-input v-model="outputLabel"></b-form-input>
 		<b-input-group-append>
@@ -77,8 +45,6 @@
 	</b-input-group>
 	
 	<project-inputs ref="inputs" 
-		v-if="projectSelected"
-		:key="projectSelected.id ? projectSelected.id : 1"
 		:api-token="apiToken" 
 		:project-id="projectSelected.id">
 	</project-inputs>
@@ -113,17 +79,16 @@ export default {
 	props: ['apiToken'],
 	data: function () {
 		return {
-			filesUploaded: [],
 			projects: [],
 			
 			projectSelected: '',
-			outputLabel: 'output',
-			outputFileExtension: 'mkv',
+			outputLabel: '',
+			outputFileExtension: '',
 			
 			fileExtensionsList: ['mkv', 'mp4'],
 			
-			aspectWidth: 848,
-			aspectHeight: 480,
+			aspectWidth: 0,
+			aspectHeight: 0,
 			
 			aspectPresets: [
 				{
@@ -147,6 +112,21 @@ export default {
 	},
 	
 	computed: {
+		defaultAspectPreset() {
+			return {
+				w: 848,
+				h: 480,
+			}
+		},
+		
+		defaultExtension() {
+			return 'mkv';
+		},
+		
+		defaultOutputName() {
+			return 'output';
+		},
+		
 		outputName() {
 			return this.outputLabel && this.outputFileExtension ? this.outputLabel + '.' + this.outputFileExtension : '';
 		},
@@ -157,19 +137,50 @@ export default {
 	},
 		
 	mounted() {
-		this.resetProject();
-		this.getFiles();
 		this.getProjects();
+		this.initProject();
+	},
+	
+	watch: {
+		projectSelected: function (newVal, oldVal) {
+			this.initProject();
+		}
 	},
 	
 	methods: {
-		resetProject: function() {
-			this.outputLabel = 'output';
-			this.outputFileExtension = 'mkv';
+		initProject: function() {
+			let self = this;
+			
+			self.outputLabel = self.projectSelected.output ? self.projectSelected.output.label : self.defaultOutputName;
+			self.outputFileExtension = self.projectSelected.output ? self.projectSelected.output.name.split('.').pop() : self.defaultExtension;
+			
+			if(self.projectSelected.output && self.projectSelected.output.width && self.projectSelected.output.height) {
+				self.aspectWidth = self.projectSelected.output.width;
+				self.aspectHeight = self.projectSelected.output.height;
+			} else {
+				self.aspectWidth = self.defaultAspectPreset.w;
+				self.aspectHeight = self.defaultAspectPreset.h;
+			}
 		},
 		
 		saveProject: function() {
 			self = this;
+			
+			axios.post('/api/projects?api_token=' + this.apiToken, {
+				label: self.outputLabel,
+				extension: self.outputFileExtension,
+				width: self.aspectWidth,
+				height: self.aspectHeight,
+			})
+    		.then(function (response) {
+    			if (response.data.status == 'success') {
+    				self.$refs.inputs.saveInputs(response.data.id);
+        			self.getProjects();
+    			}
+    		})
+    		.catch(function (error) {
+    			console.log(error);
+    		});
 		},
 		
 		updateProject: function() {
@@ -190,17 +201,6 @@ export default {
     		});
 			
 		},
-		
-		getFiles: function() {
-    		self = this;
-    		axios.get('/api/files?api_token=' + this.apiToken)
-    		.then(function (response) {
-    			self.filesUploaded = response.data;
-    		})
-    		.catch(function (error) {
-    			console.log(error);
-    		});
-    	},
     	
     	getProjects: function() {
     		self = this;
@@ -222,13 +222,6 @@ export default {
         		.then(function (response) {
         			if (response.data.status == 'success') {
         				self.projectSelected = response.data.project;
-        				self.outputLabel = self.projectSelected.output.label;
-        				self.outputFileExtension = self.projectSelected.output.name.split('.').pop();
-        				
-        				if(self.projectSelected.output.width && self.projectSelected.output.height) {
-        					self.aspectWidth = self.projectSelected.output.width;
-            				self.aspectHeight = self.projectSelected.output.height;
-        				}
         			}
         		})
         		.catch(function (error) {

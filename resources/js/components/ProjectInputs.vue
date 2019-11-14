@@ -18,7 +18,7 @@
           				class="list-group-item"
           				v-for="input in inputs"
           				:key="input.id">
-          				{{ input.name }}
+          				{{ input.label ? input.label : input.name }}
         			</div>
       			</transition-group>
 			</draggable>
@@ -43,7 +43,7 @@
           				class="list-group-item"
           				v-for="file in filesUploaded"
           				:key="file.id">
-          				{{ file.name }}
+          				{{ file.label ? file.label : file.name }}
         			</div>
       			</transition-group>
 			</draggable>
@@ -93,11 +93,24 @@ export default {
 	},
 	
 	mounted() {
-		this.getFiles();
-		this.getInputs();
+		this.init();
+	},
+	
+	watch: {
+		projectId: function (newVal, oldVal) {
+			this.init();
+		}
 	},
 	
 	methods: {
+		init: function() {
+			this.filesUploaded = [];
+			this.inputs = [];
+			
+			this.getFiles();
+			this.getInputs();
+		},
+		
 		getFiles: function() {
     		let self = this;
     		if (this.projectId) {
@@ -139,10 +152,13 @@ export default {
     		}
     	},
     	
-    	saveInputs: function () {
+    	saveInputs: function (id = false) {
     		let self = this;
-    		if (this.projectId) {
-        		axios.post('/api/projects/' + this.projectId + '/inputs?api_token=' + this.apiToken, {
+    		
+    		let projectId = id ? id : this.projectId ? this.projectId : false;
+    		
+    		if (projectId) {
+        		axios.post('/api/projects/' + projectId + '/inputs?api_token=' + this.apiToken, {
         			inputs: self.inputOrder
         		})
         		.then(function (response) {
