@@ -134,12 +134,12 @@ Vue.use(ButtonGroupPlugin)
 		      
 		      filesUploaded: [],
 		      fields_uploaded: [
-		    	  { key: 'name_to_display', label: 'Name', sortable: true },
+		    	  { key: 'label', label: 'Name', sortable: true },
 		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
 		          { key: 'upload_session.size', label: 'Size', sortable: true },
 		          { key: 'delete', label: '', sortable: false },
 		          ],
-		      uploaded_sortBy: 'name_to_display',
+		      uploaded_sortBy: 'label',
 		      uploaded_sortDesc: false,
 		    }
 		},

@@ -28,9 +28,11 @@ class InsertIntoUsers extends Migration
             'id' => 1,
             'storage_path' => 'output',
             'storage_disk' => 'files',
-            'name_to_display' => 'demoOutput',
+            'label' => 'demo',
             'name' => 'demo.mkv',
-            'user' => 1
+            'user' => 1,
+            'width' => 800,
+            'height' => 450
         ]);
         
         DB::table('projects')->insert([

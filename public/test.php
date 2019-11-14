@@ -33,18 +33,19 @@ DB::enableQueryLog();
 
 // $result = Projects::query()->with('inputs')->get();
 
-$project = Projects::query()->with('inputs')->find(1);
+$project = Projects::query()->with('inputs')->with('output')->find(1);
+// $project = Projects::query()->find(1)->output()->get();
 // $result = $result['inputs']->pluck('id');
 
 /* @var $input MediaFiles */
-foreach ($project['inputs'] as &$input) {
-//     $input->query()->addSelect
-    $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
-    ->where('media_file', $input['id'])
-    ->value('priority');
-}
+// foreach ($project['inputs'] as &$input) {
+//     $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
+//     ->where('media_file', $input['id'])
+//     ->value('priority');
+// }
 
-$result = $project['inputs']->sortBy('priority')->values()->all();
+// $result = $project['inputs']->sortBy('priority')->values()->all();
+$result = $project;
 
 // $result = array_column($result['inputs']->toArray(), 'id');
 // $result = Project::query()->whereHas('output', function($q){

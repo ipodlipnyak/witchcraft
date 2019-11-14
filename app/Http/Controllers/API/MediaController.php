@@ -109,7 +109,7 @@ class MediaController extends Controller
                     if ($i + 1 == count($chunks_list)) {
                         $file = new File("$media_storage_full_path/$file_name");
                         $file_model = MediaFiles::createFromFile($file);
-                        $file_model->name_to_display = $upload_session->name;
+                        $file_model->label = $upload_session->name;
                         $file_model->storage_path = $media_storage;
                         $file_model->storage_disk = $disk;
                         $file_model->upload_session = request('session_id');

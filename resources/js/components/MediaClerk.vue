@@ -112,6 +112,11 @@ export default {
 					self.activeSlide = newActiveSlide;
 				}
 			},
+			
+			activeSlide: function(newVal, oldVal) {
+				// if we had changed slide we should be able to swipe them
+				this.unlockSwipe = true;
+			},
 		},
         
         methods: {

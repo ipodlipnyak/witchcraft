@@ -100,43 +100,60 @@ export default {
 	methods: {
 		getFiles: function() {
     		let self = this;
-    		axios.get('/api/projects/' + this.projectId + '/files?api_token=' + this.apiToken)
-    		.then(function (response) {
-    			if (response.data.status == 'success') {
-    				self.filesUploaded = response.data.files;
-    			}
-    		})
-    		.catch(function (error) {
-    			console.log(error);
-    		});
+    		if (this.projectId) {
+        		axios.get('/api/projects/' + this.projectId + '/files?api_token=' + this.apiToken)
+        		.then(function (response) {
+        			if (response.data.status == 'success') {
+        				self.filesUploaded = response.data.files;
+        			}
+        		})
+        		.catch(function (error) {
+        			console.log(error);
+        		});
+    		} else {
+        		axios.get('/api/files?api_token=' + this.apiToken)
+        		.then(function (response) {
+        			if (response.data.status == 'success') {
+        				self.filesUploaded = response.data.files;
+        			}
+        		})
+        		.catch(function (error) {
+        			console.log(error);
+        		});
+    		}
+
     	},
     	
 		getInputs: function() {
     		let self = this;
-    		axios.get('/api/projects/' + this.projectId + '/inputs?api_token=' + this.apiToken)
-    		.then(function (response) {
-    			if (response.data.status == 'success') {
-    				self.inputs = response.data.files;
-    			}
-    		})
-    		.catch(function (error) {
-    			console.log(error);
-    		});
+    		if (this.projectId) {
+        		axios.get('/api/projects/' + this.projectId + '/inputs?api_token=' + this.apiToken)
+        		.then(function (response) {
+        			if (response.data.status == 'success') {
+        				self.inputs = response.data.files;
+        			}
+        		})
+        		.catch(function (error) {
+        			console.log(error);
+        		});
+    		}
     	},
     	
     	saveInputs: function () {
     		let self = this;
-    		axios.post('/api/projects/' + this.projectId + '/inputs?api_token=' + this.apiToken, {
-    			inputs: self.inputOrder
-    		})
-    		.then(function (response) {
-    			if (response.data.status == 'success') {
-    				//
-    			}
-    		})
-    		.catch(function (error) {
-    			console.log(error);
-    		});
+    		if (this.projectId) {
+        		axios.post('/api/projects/' + this.projectId + '/inputs?api_token=' + this.apiToken, {
+        			inputs: self.inputOrder
+        		})
+        		.then(function (response) {
+        			if (response.data.status == 'success') {
+        				//
+        			}
+        		})
+        		.catch(function (error) {
+        			console.log(error);
+        		});
+    		}
     	},
 		
 		sort() {

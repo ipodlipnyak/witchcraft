@@ -19,7 +19,9 @@ class CreateMediaFilesTable extends Migration
             $table->string('name');
             $table->string('storage_path')->nullable();
             $table->string('storage_disk')->nullable();
-            $table->string('name_to_display')->nullable();
+            $table->string('label')->nullable();
+            $table->integer('width')->nullable();
+            $table->integer('height')->nullable();
             $table->bigInteger('upload_session')->unsigned()->nullable();
             $table->integer('start_offset')->nullable();
             $table->timestamps();

@@ -33,6 +33,7 @@ Route::middleware([
     Route::prefix('projects')->group(function () {
         Route::get('/', 'API\ProjectsController@index');
         Route::get('/{id}', 'API\ProjectsController@show');
+        Route::post('/{id}', 'API\ProjectsController@update');
         Route::get('/{id}/files', 'API\ProjectsController@getAvailableFiles');
         Route::get('/{id}/inputs', 'API\ProjectsController@getInputs');
         Route::post('/{id}/inputs', 'API\ProjectsController@updateInputs');

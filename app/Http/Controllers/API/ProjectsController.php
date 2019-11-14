@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\MediaFiles;
 use App\ProjectInputs;
 use phpDocumentor\Reflection\Project;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectsController extends Controller
 {
@@ -94,8 +95,10 @@ class ProjectsController extends Controller
             'status' => 'error'
         ];
         
-        $poject = Projects::query()->with('inputs')->find(request('id'));
-        $files = MediaFiles::query()->where('user',Auth::user()->id)->whereKeyNot($poject['inputs']->pluck('id'))->get();
+        $project = Projects::query()->with('inputs')->find(request('id'));
+        $files_to_skip = $project['inputs']->pluck('id')->toArray();
+        array_push($files_to_skip, $project['output']);
+        $files = MediaFiles::query()->where('user',Auth::user()->id)->whereKeyNot($files_to_skip)->get();
         
         if ($files) {
             $result['status'] = 'success';
@@ -160,13 +163,39 @@ class ProjectsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update()
     {
-        //
+        $result = [
+            'status' => 'error'
+        ];
+        
+        /* @var $project Projects */
+        $project = Projects::query()->find(request('id'));
+        $output = $project->output()->get()->first();
+        if ($output) {
+            $output->label = request('label');
+            $output->width = request('width');
+            $output->height = request('height');
+            
+            $new_extension = request('extension');
+            if ($new_extension) {
+                $new_output_name = preg_replace('/\.[^.]+$/', '.', $output->name).$new_extension;
+                
+                if (Storage::disk($output->storage_disk)->exists("{$output->storage_path}/{$output->name}")) {
+                    Storage::disk($output->storage_disk)->move("{$output->storage_path}/{$output->name}", "{$output->storage_path}/{$new_output_name}");
+                }
+                
+                $output->name = $new_output_name;
+            }
+            
+            if ($output->save()) {
+                $result['status'] = 'success';
+            }
+        }
+        
+        return response()->json($result);
     }
 
     /**
