@@ -22,6 +22,8 @@ class CreateMediaFilesTable extends Migration
             $table->string('label')->nullable();
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();
+            $table->float('ratio')->nullable();
+            $table->integer('duration')->nullable();
             $table->bigInteger('upload_session')->unsigned()->nullable();
             $table->integer('start_offset')->nullable();
             $table->timestamps();

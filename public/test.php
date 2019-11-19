@@ -5,6 +5,7 @@ use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 use Illuminate\Container\Container;
 use Pbmedia\LaravelFFMpeg\Media;
 use FFMpeg\FFProbe\DataMapping\Stream;
+use League\Flysystem\Filesystem as Driver;
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
@@ -16,12 +17,19 @@ $container = Container::getInstance();
 DB::enableQueryLog();
 
 /* @var $media Media */
-$media = FFmpeg::fromDisk('files')->open('media/1_1.mkv');
+$media = FFmpeg::fromDisk('files')->open('media/1_nygnA_1.mkv');
 $media->getDurationInSeconds();
 
 /* @var $stream Stream */
 $stream = $media->getFirstStream();
-$result = $stream->getDimensions()->getHeight();
+$file = $media->getFile();
+$disk = $file->getDisk();
+/* @var $driver Driver */
+$driver = $disk->getDriver();
+
+// $result = $stream->getDimensions()->getHeight();
+$result = last(array_filter(explode('/', $disk->getPath())));
+// $result = $file->getPath();
 
 $log = DB::getQueryLog();
 

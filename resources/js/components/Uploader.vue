@@ -47,8 +47,7 @@
   <file-upload
     ref="upload"
     v-model="files"
-    post-action="/post.method"
-    put-action="/put.method"
+    :post-action="uploadAction"
     @input-file="inputFile"
     @input-filter="inputFilter"
     

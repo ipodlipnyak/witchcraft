@@ -9,9 +9,15 @@ use Illuminate\Support\Str;
 use App\UploadSessions;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\File;
+use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
+use Pbmedia\LaravelFFMpeg\Media;
+use FFMpeg\FFProbe\DataMapping\Stream;
 
 class MediaController extends Controller
 {
+    
+    protected $media_storage = 'media';
+    protected $disk = 'files';
 
     /**
      * Display a listing of the uploaded files
@@ -48,8 +54,6 @@ class MediaController extends Controller
      */
     public function store(Request $request)
     {
-        $disk = 'files';
-
         switch (request('phase')) {
             case 'start':
                 $upload_session = new UploadSessions();
@@ -70,12 +74,12 @@ class MediaController extends Controller
             case 'upload':
                 $file = $request->file('chunk');
                 $storage_path = 'chunks';
-                $file = $file->move(Storage::disk($disk)->getAdapter()
+                $file = $file->move(Storage::disk($this->disk)->getAdapter()
                     ->getPathPrefix() . $storage_path);
 
                 $file_model = MediaFiles::createFromFile($file);
                 $file_model->storage_path = $storage_path;
-                $file_model->storage_disk = $disk;
+                $file_model->storage_disk = $this->disk;
                 $file_model->upload_session = request('session_id');
                 $file_model->start_offset = request('start_offset');
                 $file_model->save();
@@ -92,20 +96,20 @@ class MediaController extends Controller
                     ->get();
 
                 $upload_session = UploadSessions::query()->find($upload_session_id);
-                $file_name = "{$upload_session_id}_{$upload_session->name}";
+                $random_prefix = Str::random(5);
+                $file_name = "{$upload_session_id}_{$random_prefix}_{$upload_session->name}";
 
-                $media_storage = 'media';
-                $storage_full_prefix = Storage::disk($disk)->getAdapter()->getPathPrefix();
-                $media_storage_full_path = $storage_full_prefix . $media_storage;
+                $storage_full_prefix = Storage::disk($this->disk)->getAdapter()->getPathPrefix();
+                $media_storage_full_path = $storage_full_prefix . $this->media_storage;
 
                 /* @var $chunk_model MediaFiles */
                 foreach ($chunks_list as $i => $chunk_model) {
                     $chunk_path = "{$chunk_model->storage_path}/{$chunk_model->name}";
                     // if file exist we assume that uploading had been interrupted. In that case first chunk should be merged with this file
-                    if ($i == 0 && ! Storage::disk($disk)->exists("$media_storage/$file_name")) {
-                        Storage::disk($disk)->copy($chunk_path, "$media_storage/$file_name");
+                    if ($i == 0 && ! Storage::disk($this->disk)->exists("{$this->media_storage}/{$file_name}")) {
+                        Storage::disk($this->disk)->copy($chunk_path, "{$this->media_storage}/{$file_name}");
                     } else {
-                        $chunk = Storage::disk($disk)->get($chunk_path);
+                        $chunk = Storage::disk($this->disk)->get($chunk_path);
 
                         if (! file_put_contents("{$media_storage_full_path}/{$file_name}", $chunk, FILE_APPEND | LOCK_EX)) {
                             $msg = "Chunk #$i {$chunk_model->name} can not be merged into $file_name";
@@ -118,17 +122,21 @@ class MediaController extends Controller
                     }
 
                     if ($i + 1 == count($chunks_list)) {
-                        $file = new File("$media_storage_full_path/$file_name");
-                        $file_model = MediaFiles::createFromFile($file);
+                        $file = new File("{$media_storage_full_path}/{$file_name}");
+                        
+                        /* @var $media Media */
+                        $media = FFmpeg::fromDisk($this->disk)->open("{$this->media_storage}/{$file_name}");
+                        /* @var $stream Stream */
+                        $stream = $media->getFirstStream();
+                        
+                        $file_model = MediaFiles::createFromMedia($media);
                         $file_model->label = $upload_session->name;
-                        $file_model->storage_path = $media_storage;
-                        $file_model->storage_disk = $disk;
                         $file_model->upload_session = request('session_id');
                         $file_model->save();
                     }
 
                     // remove chunk from disk and db
-                    Storage::disk($disk)->delete($chunk_path);
+                    Storage::disk($this->disk)->delete($chunk_path);
                     $chunk_model->delete();
                 }
 
@@ -138,14 +146,33 @@ class MediaController extends Controller
                 break;
 
             default:
-                $file = $request->file();
-                $storage_path = 'media';
-                $file = $file->move(Storage::disk($disk)->getAdapter()
-                    ->getPathPrefix() . $storage_path);
+                $file = $request->file('file');
+                $random_prefix = Str::random(5);
+                $file_name = "{$random_prefix}_{$file->getClientOriginalName()}";
+                
+                $upload_session = new UploadSessions();
+                $upload_session->name = $file->getClientOriginalName();
+                $upload_session->mime_type = $file->getMimeType();
+                $upload_session->size = $file->getSize();
+                $upload_session->save();
+                
+                $file = $file->move(Storage::disk($this->disk)->getAdapter()
+                    ->getPathPrefix() . $this->media_storage, $file_name);
+                
+                /* @var $media Media */
+                $media = FFmpeg::fromDisk($this->disk)->open("{$this->media_storage}/{$file_name}");
 
-                $file_model = MediaFiles::createFromFile($file);
-                $file_model->storage_path = $storage_path;
-                $file_model->storage_disk = $disk;
+                $file_model = MediaFiles::createFromMedia($media);
+                
+                /* 
+                 * @TODO This is weird. 
+                 * Not sure if i need to store same value in separate tables.
+                 * Except when i have one to many relations between upload session and uploaded chunkes.
+                 * Maybe should to reconsider it later 
+                 * */
+                $file_model->label = $upload_session->name;
+                
+                $file_model->upload_session = $upload_session->id;
                 $file_model->save();
 
                 $result = [
