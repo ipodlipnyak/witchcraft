@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Support\Facades\Storage;
 use Pbmedia\LaravelFFMpeg\Media;
 use FFMpeg\FFProbe\DataMapping\Stream;
+use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 
 class MediaFiles extends Model
 {
@@ -33,12 +34,12 @@ class MediaFiles extends Model
         /* @var $stream Stream */
         $stream = $media->getFirstStream();
         $file = $media->getFile();
-        
+
         $path = explode('/', $file->getPath());
         $name = array_pop($path);
         $media_storage = implode('/', $path);
         $disk = last(array_filter(explode('/', $file->getDisk()->getPath())));
-        
+
         $file_model = new MediaFiles();
         $file_model->user = Auth::user()->id;
         $file_model->name = $name;
@@ -47,7 +48,9 @@ class MediaFiles extends Model
         $file_model->duration = $media->getDurationInSeconds();
         $file_model->height = $stream->getDimensions()->getHeight();
         $file_model->width = $stream->getDimensions()->getWidth();
-        $file_model->ratio = $stream->getDimensions()->getRatio(true)->getValue();
+        $file_model->ratio = $stream->getDimensions()
+            ->getRatio(true)
+            ->getValue();
         $file_model->save();
         return $file_model;
     }
@@ -70,5 +73,19 @@ class MediaFiles extends Model
     public function uploadSession()
     {
         return $this->hasOne('App\UploadSessions', 'id', 'upload_session');
+    }
+
+    /**
+     * Get media file object, which represented by this model
+     *
+     * @return Media|NULL
+     */
+    public function getMedia(): ?Media
+    {
+        if (Storage::disk($this->storage_disk)->exists("{$this->storage_path}/{$this->name}")) {
+            return FFmpeg::fromDisk($this->storage_disk)->open("{$this->storage_path}/{$this->name}");
+        }
+
+        return null;
     }
 }

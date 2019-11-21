@@ -7,6 +7,8 @@ use Pbmedia\LaravelFFMpeg\Media;
 use FFMpeg\FFProbe\DataMapping\Stream;
 use League\Flysystem\Filesystem as Driver;
 use App\Projects;
+use App\MediaFiles;
+use App\ProjectInputs;
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
@@ -32,8 +34,18 @@ DB::enableQueryLog();
 // $result = last(array_filter(explode('/', $disk->getPath())));
 // $result = $file->getPath();
 
+/* @var $task Projects */
 $task = Projects::query()->where('status', 2)->first();
-$result = $task->inputs()->get()[0]->getFullPath(0);
+/* @var $input MediaFiles */
+/* @var $output MediaFiles */
+// $output = $task->output()->first();
+// $input = $task->inputs()->first();
+// $media = $input->getMedia();
+// $result = $output->getMedia();
+
+// $result = ProjectInputs::query()->where('project', 1)->orderBy('priority','ASC')->value('media_file');
+$media = $task->getOutputMediaOrCreate();
+$result = $media->getDurationInSeconds();
 
 
 $log = DB::getQueryLog();

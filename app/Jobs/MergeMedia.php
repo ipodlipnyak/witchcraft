@@ -10,6 +10,7 @@ use App\Projects;
 use App\ProjectStatuses;
 use App\MediaFiles;
 use FFMpeg\Media\Concat;
+use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 
 class MergeMedia implements ShouldQueue
 {
@@ -61,10 +62,18 @@ class MergeMedia implements ShouldQueue
      */
     protected function merge(Projects $task): bool
     {
-        /* @var $input MediaFiles */
-        foreach ($task->inputs()->get() as $input) {
+        $output_media = $task->getOutputMediaOrCreate();
+        if (! $output_media) {
+            return false;
+        }
+        /* @var $output_model MediaFiles */
+        $output_model = $task->output()->first();
+        
+        /* @var $input_model MediaFiles */
+        foreach ($task->inputs()->get() as $input_model) {
             /* @TODO work in progress */
-            $input->getFullPath();
+            $input_model->getFullPath();
+            $input_media = $input->getMedia();
         }
 
         $task->progress = 1;
