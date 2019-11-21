@@ -35,6 +35,10 @@ class CreateProjectStatusesTable extends Migration
             [
                 'id' => 4,
                 'name' => 'DONE'
+            ],
+            [
+                'id' => 5,
+                'name' => 'BROKEN'
             ]
         ]);
     }
