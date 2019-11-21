@@ -16,9 +16,12 @@ class CreateProjectsTable extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('output')->unsigned()->nullable();
+            $table->bigInteger('status')->unsigned()->default(1);
+            $table->float('progress')->default(0);
             $table->timestamps();
             
             $table->foreign('output')->references('id')->on('media_files')->onDelete('cascade');
+            $table->foreign('status')->references('id')->on('project_statuses')->onDelete('restrict');
         });
     }
 
