@@ -11,6 +11,7 @@ use App\ProjectStatuses;
 use App\MediaFiles;
 use FFMpeg\Media\Concat;
 use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
+use FFMpeg\FFProbe\DataMapping\Stream;
 
 class MergeMedia implements ShouldQueue
 {
@@ -73,7 +74,7 @@ class MergeMedia implements ShouldQueue
         foreach ($task->inputs()->get() as $input_model) {
             /* @TODO work in progress */
             $input_model->getFullPath();
-            $input_media = $input->getMedia();
+            $input_media = $input_model->getMedia();
         }
 
         $task->progress = 1;
@@ -90,6 +91,20 @@ class MergeMedia implements ShouldQueue
      */
     protected function consistencyCheck(Projects $task): bool
     {
+        $output_media = $task->getOutputMediaOrCreate();
+        if (! $output_media) {
+            return false;
+        }
+        
+        /* @var $stream Stream */
+        $stream = $output_media->getFirstStream();
+        $output_ratio = $stream->getDimensions()->getRatio();
+        
+        /* @var $input_model MediaFiles */
+        foreach ($task->inputs()->get() as $input_model) {
+            $input_media = $input_model->getMedia();
+        }
+        
         return true;
     }
 }

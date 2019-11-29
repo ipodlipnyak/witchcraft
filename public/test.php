@@ -35,8 +35,9 @@ DB::enableQueryLog();
 // $result = $file->getPath();
 
 /* @var $task Projects */
-$task = Projects::query()->where('status', 2)->first();
-/* @var $input MediaFiles */
+// $task = Projects::query()->where('status', 2)->first();
+$task = Projects::query()->first();
+/* @var $input ProjectInputs */
 /* @var $output MediaFiles */
 // $output = $task->output()->first();
 // $input = $task->inputs()->first();
@@ -44,8 +45,11 @@ $task = Projects::query()->where('status', 2)->first();
 // $result = $output->getMedia();
 
 // $result = ProjectInputs::query()->where('project', 1)->orderBy('priority','ASC')->value('media_file');
-$media = $task->getOutputMediaOrCreate();
-$result = $media->getDurationInSeconds();
+// $media = $task->getOutputMediaOrCreate();
+// $result = $media->getDurationInSeconds();
+// $input = ProjectInputs::query()->where('project', $task->id)->get()[0];
+// $result = $input->media_file()->first();
+$result = $task->consistencyCheck();
 
 
 $log = DB::getQueryLog();

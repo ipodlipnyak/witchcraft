@@ -16,11 +16,13 @@ class CreateProjectInputsTable extends Migration
         Schema::create('project_inputs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('project')->unsigned();
+            $table->bigInteger('status')->unsigned()->nullable();
             $table->bigInteger('media_file')->unsigned();
             $table->integer('priority')->nullable();
             $table->timestamps();
             
             $table->foreign('project')->references('id')->on('projects');
+            $table->foreign('status')->references('id')->on('input_statuses')->onDelete('set NULL');
             $table->foreign('media_file')->references('id')->on('media_files')->onDelete('restrict');
         });
     }

@@ -6,6 +6,7 @@ use Pbmedia\LaravelFFMpeg\Media;
 use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use FFMpeg\FFProbe\DataMapping\Stream;
 
 class Projects extends Model
 {
@@ -28,6 +29,46 @@ class Projects extends Model
     public function inputs()
     {
         return $this->hasManyThrough('App\MediaFiles', 'App\ProjectInputs', 'project', 'id', 'id', 'media_file');
+    }
+
+    /**
+     * Check if every project inputs coherent with each other
+     *
+     * @param Projects $task
+     * @return bool
+     */
+    public function consistencyCheck(): bool
+    {
+        $output_media = $this->getOutputMediaOrCreate();
+        $output_model = $this->output()->first();
+
+        /* @var $output_stream Stream */
+        $output_stream = $output_media->getFirstStream();
+
+        $input_list = ProjectInputs::query()->where('project', $this->id)->get();
+
+        $brocken_count = 0;
+        /* @var $input_model ProjectInputs */
+        foreach ($input_list as $input_model) {
+            /* @var $input_model MediaFiles */
+            $media_model = $input_model->media_file()->first();
+            $input_media = $media_model->getMedia();
+            /* @var $input_stream Stream */
+            $input_stream = $input_media->getFirstStream();
+
+            if ($input_stream->getDimensions()
+                ->getRatio()
+                ->calculateHeight($output_model->width) != $output_model->height) {
+
+                $input_model->status = InputStatuses::WRONG_RATIO;
+                $input_model->save();
+                $brocken_count ++;
+            } else {
+                $input_model->status = InputStatuses::READY;
+            }
+        }
+
+        return $brocken_count == 0;
     }
 
     /**
