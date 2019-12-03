@@ -50,10 +50,12 @@ DB::enableQueryLog();
 // $input = ProjectInputs::query()->where('project', $task->id)->get()[0];
 // $result = $input->media_file()->first();
 
-$output = MediaFiles::query()->find(1);
-$task = $output->projectsOutput()->get()->first();
-$result = $task;
+// $output = MediaFiles::query()->find(1);
+// $task = $output->projectsOutput()->get()->first();
+// $result = $task;
 // $result = $task->consistencyCheck();
+
+$result = env('FFMPEG_OUTPUT_FOLDER');
 
 
 $log = DB::getQueryLog();

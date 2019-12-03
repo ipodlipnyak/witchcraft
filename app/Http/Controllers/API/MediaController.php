@@ -15,9 +15,19 @@ use FFMpeg\FFProbe\DataMapping\Stream;
 
 class MediaController extends Controller
 {
-    
-    protected $media_storage = 'media';
-    protected $disk = 'files';
+
+    protected $disk = '';
+
+    protected $media_storage = '';
+
+    protected $output_storage = '';
+
+    public function __construct()
+    {
+        $this->disk = env('FFMPEG_DISK');
+        $this->media_storage = env('FFMPEG_INPUT_FOLDER');
+        $this->output_storage = env('FFMPEG_OUTPUT_FOLDER');
+    }
 
     /**
      * Display a listing of the uploaded files
@@ -30,8 +40,7 @@ class MediaController extends Controller
             'status' => 'error'
         ];
 
-        $files = MediaFiles::query()
-            ->with('UploadSession')
+        $files = MediaFiles::query()->with('UploadSession')
             ->where('user', Auth::user()->id)
             ->where('start_offset', null)
             ->where('storage_path', 'media')
@@ -42,7 +51,7 @@ class MediaController extends Controller
             $result['status'] = 'success';
             $result['files'] = $files;
         }
-        
+
         return response()->json($result);
     }
 
@@ -123,12 +132,12 @@ class MediaController extends Controller
 
                     if ($i + 1 == count($chunks_list)) {
                         $file = new File("{$media_storage_full_path}/{$file_name}");
-                        
+
                         /* @var $media Media */
                         $media = FFmpeg::fromDisk($this->disk)->open("{$this->media_storage}/{$file_name}");
                         /* @var $stream Stream */
                         $stream = $media->getFirstStream();
-                        
+
                         $file_model = MediaFiles::createFromMedia($media);
                         $file_model->label = $upload_session->name;
                         $file_model->upload_session = request('session_id');
@@ -149,29 +158,29 @@ class MediaController extends Controller
                 $file = $request->file('file');
                 $random_prefix = Str::random(5);
                 $file_name = "{$random_prefix}_{$file->getClientOriginalName()}";
-                
+
                 $upload_session = new UploadSessions();
                 $upload_session->name = $file->getClientOriginalName();
                 $upload_session->mime_type = $file->getMimeType();
                 $upload_session->size = $file->getSize();
                 $upload_session->save();
-                
+
                 $file = $file->move(Storage::disk($this->disk)->getAdapter()
                     ->getPathPrefix() . $this->media_storage, $file_name);
-                
+
                 /* @var $media Media */
                 $media = FFmpeg::fromDisk($this->disk)->open("{$this->media_storage}/{$file_name}");
 
                 $file_model = MediaFiles::createFromMedia($media);
-                
-                /* 
-                 * @TODO This is weird. 
+
+                /*
+                 * @TODO This is weird.
                  * Not sure if i need to store same value in separate tables.
                  * Except when i have one to many relations between upload session and uploaded chunkes.
-                 * Maybe should to reconsider it later 
-                 * */
+                 * Maybe should to reconsider it later
+                 */
                 $file_model->label = $upload_session->name;
-                
+
                 $file_model->upload_session = $upload_session->id;
                 $file_model->save();
 

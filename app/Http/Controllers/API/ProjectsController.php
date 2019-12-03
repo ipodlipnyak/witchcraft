@@ -50,6 +50,8 @@ class ProjectsController extends Controller
         $extension = $request->get('extension');
         $output->name = "{$user_id}_{$project->id}_{$suffix}.{$extension}";
 
+        $output->storage_path = env('FFMPEG_OUTPUT_FOLDER');
+        $output->storage_disk = env('FFMPEG_DISK');
         $output->user = $user_id;
         $output->width = $request->get('width');
         $output->height = $request->get('height');
@@ -162,9 +164,11 @@ class ProjectsController extends Controller
         $project = Projects::query()->with('inputs')->find(request('id'));
 
         foreach ($project['inputs'] as &$input) {
-            $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
+            $project_input_model = ProjectInputs::query()->where('project', $project['id'])
                 ->where('media_file', $input['id'])
-                ->value('priority');
+                ->first();
+            $input['priority'] = $project_input_model->priority;
+            $input['status'] = $project_input_model->status;
         }
 
         $files = $project['inputs']->sortBy('priority')
