@@ -29,9 +29,6 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        /* @TODO not working */
-        Event::listen('eloquent.saved: Projects', function ($project) {
-            $project->consistencyCheck();
-        });
+        //
     }
 }

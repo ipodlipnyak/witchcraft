@@ -13,6 +13,16 @@ class MediaFiles extends Model
 {
 
     /**
+     * Relation to project which contains this file as an output
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function projectsOutput()
+    {
+        return $this->belongsTo('App\Projects', 'id', 'output');
+    }
+
+    /**
      *
      * @param File $file
      * @param string $storage_path

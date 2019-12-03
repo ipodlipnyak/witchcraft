@@ -228,12 +228,19 @@ class ProjectsController extends Controller
             $new_extension = request('extension');
             if ($new_extension) {
                 $new_output_name = preg_replace('/\.[^.]+$/', '.', $output->name) . $new_extension;
-
-                if (Storage::disk($output->storage_disk)->exists("{$output->storage_path}/{$output->name}")) {
-                    Storage::disk($output->storage_disk)->move("{$output->storage_path}/{$output->name}", "{$output->storage_path}/{$new_output_name}");
+                
+                if ($output->name != $new_output_name) {
+                    if (Storage::disk($output->storage_disk)->exists("{$output->storage_path}/{$new_output_name}")) {
+                        $result['status'] = 'error';
+                        $result['msg'] = 'File name already in use';
+                    }
+                    
+                    if (Storage::disk($output->storage_disk)->exists("{$output->storage_path}/{$output->name}")) {
+                        Storage::disk($output->storage_disk)->move("{$output->storage_path}/{$output->name}", "{$output->storage_path}/{$new_output_name}");
+                    }
+                    
+                    $output->name = $new_output_name;
                 }
-
-                $output->name = $new_output_name;
             }
 
             if ($output->save()) {
