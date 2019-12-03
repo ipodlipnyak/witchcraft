@@ -36,12 +36,12 @@ DB::enableQueryLog();
 
 /* @var $task Projects */
 // $task = Projects::query()->where('status', 2)->first();
-// $task = Projects::query()->first();
+$task = Projects::query()->first();
 /* @var $input ProjectInputs */
 /* @var $output MediaFiles */
 // $output = $task->output()->first();
-// $input = $task->inputs()->first();
-// $media = $input->getMedia();
+$input = $task->inputs()->first();
+$media = $input->getMedia();
 // $result = $output->getMedia();
 
 // $result = ProjectInputs::query()->where('project', 1)->orderBy('priority','ASC')->value('media_file');
@@ -50,12 +50,14 @@ DB::enableQueryLog();
 // $input = ProjectInputs::query()->where('project', $task->id)->get()[0];
 // $result = $input->media_file()->first();
 
-// $output = MediaFiles::query()->find(1);
+// $output = MediaFiles::query()->find(2);
 // $task = $output->projectsOutput()->get()->first();
-// $result = $task;
-// $result = $task->consistencyCheck();
+// $result = $task->output()->first();
+$result = $task->consistencyCheck();
 
-$result = env('FFMPEG_OUTPUT_FOLDER');
+// $result = env('FFMPEG_OUTPUT_FOLDER');
+
+// $result = $media->get
 
 
 $log = DB::getQueryLog();

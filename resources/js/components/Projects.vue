@@ -37,11 +37,15 @@
 		<b-form-input v-model="aspectHeight"></b-form-input>
 		<template v-slot:append>
 			<b-dropdown text="Presets" variant="primary">
-				<b-dropdown-item v-for="set in aspectPresets" 
-					:key="set.name" 
-					@click="selectPreset(set)">
-					{{ set.name }}
-				</b-dropdown-item>
+				
+				<b-dropdown-group v-for="standart in aspectPresets" :key="standart.standart" :header="standart.label">
+					<b-dropdown-item v-for="set in standart.presets" 
+						:key="set.name" 
+						@click="selectPreset(set)">
+						{{ set.name }}
+					</b-dropdown-item>
+				</b-dropdown-group>
+				
 			</b-dropdown>
     	</template>
 	</b-input-group>
@@ -95,19 +99,60 @@ export default {
 			
 			aspectPresets: [
 				{
-					name: 'Full HD',
-					w: 1920,
-					h: 1080,
+					standart: '16:9',
+					r: '1.77',
+					label: '16:9 R:1.77',
+					presets: [
+						{
+							name: 'Full HD',
+							w: 1920,
+							h: 1080,
+						},
+						{
+							name: 'HD',
+							w: 1280,
+							h: 720,
+						},
+						{
+							name: 'WVGA',
+							w: 848,
+							h: 480,
+						},
+					],
 				},
 				{
-					name: 'HD',
-					w: 1280,
-					h: 720,
+					standart: '4:3',
+					r: '1.33',
+					label: '4:3 R:1.33',
+					presets: [
+						{
+							name: 'UXGA',
+							w: 1600,
+							h: 1200,
+						},
+						{
+							name: 'XGA',
+							w: 1024,
+							h: 768,
+						},
+						{
+							name: 'SVGA',
+							w: 800,
+							h: 600,
+						},
+					],
 				},
 				{
-					name: 'WVGA',
-					w: 848,
-					h: 480,
+					standart: '1:1',
+					r: '1',
+					label: '1:1 R:1',
+					presets: [
+						{
+							name: 'Square',
+							w: 800,
+							h: 800,
+						},
+					],
 				},
 			],
 			

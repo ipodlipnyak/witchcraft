@@ -117,6 +117,7 @@ class ProjectsController extends Controller
         array_push($files_to_skip, $project['output']);
         $files = MediaFiles::query()->where('user', Auth::user()->id)
             ->whereKeyNot($files_to_skip)
+            ->where('start_offset', null)
             ->get();
 
         if ($files) {

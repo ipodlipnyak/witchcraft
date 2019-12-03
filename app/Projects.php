@@ -56,6 +56,8 @@ class Projects extends Model
             /* @var $input_stream Stream */
             $input_stream = $input_media->getFirstStream();
 
+            // $input_too_small = ($input_model->width < $output_model->width) && ($input_model->height < $output_model->height);
+
             if ($input_stream->getDimensions()
                 ->getRatio()
                 ->calculateHeight($output_model->width) != $output_model->height) {
@@ -65,6 +67,7 @@ class Projects extends Model
                 $brocken_count ++;
             } else {
                 $input_model->status = InputStatuses::READY;
+                $input_model->save();
             }
         }
 

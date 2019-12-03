@@ -16,9 +16,12 @@
 				<transition-group type="transition" :name="!drag ? 'flip-list' : null">
         			<div
           				class="list-group-item"
+          				:class="getInputClass(input)"
           				v-for="input in inputs"
           				:key="input.id">
-          				{{ input.label ? input.label : input.name }}
+          				<p class="mb-1">{{ input.label ? input.label : input.name }}</p> 
+          				<small>W:{{ input.width }} H:{{ input.height }}</small>
+          				<small>R:{{ input.ratio }}</small>
         			</div>
       			</transition-group>
 			</draggable>
@@ -43,7 +46,9 @@
           				class="list-group-item"
           				v-for="file in filesUploaded"
           				:key="file.id">
-          				{{ file.label ? file.label : file.name }}
+          				<p class="mb-1">{{ file.label ? file.label : file.name }}</p> 
+          				<small>W:{{ file.width }} H:{{ file.height }}</small>
+          				<small v-if="file.ratio">R:{{ file.ratio }}</small>
         			</div>
       			</transition-group>
 			</draggable>
@@ -163,13 +168,27 @@ export default {
         		})
         		.then(function (response) {
         			if (response.data.status == 'success') {
-        				//
+        				self.init();
         			}
         		})
         		.catch(function (error) {
         			console.log(error);
         		});
     		}
+    	},
+    	
+    	getInputClass: function (input) {
+    		if (input.status && input.status == 1) {
+    			return 'list-group-item-success';
+    		} else if(input.status && input.status == 2) {
+    			return 'list-group-item-danger';
+    		} else if(input.status && input.status == 3) {
+    			return 'list-group-item-warning';
+    		} else if(input.status && input.status > 1) {
+    			return 'list-group-item-info';
+    		}
+    		
+    		return '';
     	},
 		
 		sort() {
