@@ -3,6 +3,8 @@
 
 <!-- Edit selected project -->
 <div v-if="projectSelected">
+	<b-alert v-if="errorMessage" show variant="danger">{{ errorMessage }}</b-alert>
+	
 	<b-button-group  size="bg" class="btn-block">
 		<b-button squared @click="updateProject" variant="success" class="mb-4">Save</b-button>
 		<b-button squared @click="selectProject('')" variant="primary" class="mb-4">Close</b-button>
@@ -66,8 +68,9 @@
 
 <script>
 import ProjectInputs from './ProjectInputs';
-import { InputGroupPlugin, FormInputPlugin, ButtonPlugin, ListGroupPlugin, CardPlugin, DropdownPlugin } from 'bootstrap-vue';
+import { AlertPlugin, InputGroupPlugin, FormInputPlugin, ButtonPlugin, ListGroupPlugin, CardPlugin, DropdownPlugin } from 'bootstrap-vue';
 
+Vue.use(AlertPlugin)
 Vue.use(InputGroupPlugin)
 Vue.use(FormInputPlugin)
 Vue.use(ButtonPlugin)
@@ -107,6 +110,8 @@ export default {
 					h: 480,
 				},
 			],
+			
+			errorMessage: '',
 			
 		}
 	},
@@ -150,6 +155,7 @@ export default {
 	methods: {
 		initProject: function() {
 			let self = this;
+			self.errorMessage = '';
 			
 			self.outputLabel = self.projectSelected.output ? self.projectSelected.output.label : self.defaultOutputName;
 			self.outputFileExtension = self.projectSelected.output ? self.projectSelected.output.name.split('.').pop() : self.defaultExtension;
@@ -195,7 +201,12 @@ export default {
 				height: self.aspectHeight,
 			})
     		.then(function (response) {
-    			self.getProjects();
+    			if (response.data.status == 'error') {
+    				self.errorMessage = response.data.message ? response.data.message : '';
+    			} else {
+    				self.errorMessage = '';
+    				self.getProjects();
+    			}
     		})
     		.catch(function (error) {
     			console.log(error);

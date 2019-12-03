@@ -5,6 +5,12 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\ProjectInputs;
+use App\Observers\ProjectInputsObserver;
+use App\MediaFiles;
+use App\Observers\MediaFilesObserver;
+use App\Projects;
+use App\Observers\ProjectsObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -29,6 +35,8 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        //
+        Projects::observe(ProjectsObserver::class);
+        ProjectInputs::observe(ProjectInputsObserver::class);
+        MediaFiles::observe(MediaFilesObserver::class);
     }
 }
