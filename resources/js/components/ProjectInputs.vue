@@ -15,14 +15,36 @@
         		tag="div">
 				<transition-group type="transition" :name="!drag ? 'flip-list' : null">
         			<div
-          				class="list-group-item"
-          				:class="getInputClass(input)"
-          				v-for="input in inputs"
-          				:key="input.id">
-          				<p class="mb-1">{{ input.label ? input.label : input.name }}</p> 
-          				<small>W:{{ input.width }} H:{{ input.height }}</small>
-          				<small>R:{{ input.ratio }}</small>
+        				v-for="file in inputs"
+          				class="list-group-item p-0"
+          				:class="getInputClass(file)"
+          				:key="file.id">
+          				
+          				<b-card 
+          					no-body
+          					class="overflow-hidden"
+          					style="max-height: 3rem;"
+          					
+          					<b-row no-gutters>
+          						<b-col md="4">
+        							<b-card-img :src="'/storage/thumbs/' + file.id" class="rounded-0"></b-card-img>
+      							</b-col>
+      							
+      							<b-col md="8">
+      							<b-card-body :title="file.label ? file.label : file.name">
+      							
+      								<b-card-text>
+      									<small>W:{{ file.width }} H:{{ file.height }}</small>
+          								<small v-if="file.ratio">R:{{ file.ratio }}</small>
+    								</b-card-text>
+      							
+      							</b-card-body>
+      							</b-col>
+          					</b-row>
+    						
+  						</b-card>
         			</div>
+        			
       			</transition-group>
 			</draggable>
 		</div>
@@ -43,12 +65,33 @@
         		tag="div">
 				<transition-group type="transition" :name="!drag ? 'flip-list' : null">
         			<div
-          				class="list-group-item"
+          				class="list-group-item p-0"
           				v-for="file in filesUploaded"
           				:key="file.id">
-          				<p class="mb-1">{{ file.label ? file.label : file.name }}</p> 
-          				<small>W:{{ file.width }} H:{{ file.height }}</small>
-          				<small v-if="file.ratio">R:{{ file.ratio }}</small>
+          				
+          				<b-card 
+          					no-body
+          					class="overflow-hidden"
+          					style="max-height: 3rem;"
+          					
+          					<b-row no-gutters>
+          						<b-col md="4">
+        							<b-card-img :src="'/storage/thumbs/' + file.id" class="rounded-0"></b-card-img>
+      							</b-col>
+      							
+      							<b-col md="8">
+      							<b-card-body class="overflow-hidden mr-1" :title="file.label ? file.label : file.name">
+      							
+      								<b-card-text>
+      									<small>W:{{ file.width }} H:{{ file.height }}</small>
+          								<small v-if="file.ratio">R:{{ file.ratio }}</small>
+    								</b-card-text>
+      							
+      							</b-card-body>
+      							</b-col>
+          					</b-row>
+    						
+  						</b-card>
         			</div>
       			</transition-group>
 			</draggable>
@@ -59,8 +102,11 @@
 
 <script>
 import draggable from 'vuedraggable'
-import { ListGroupPlugin } from 'bootstrap-vue'
+import { LayoutPlugin, CardPlugin, ImagePlugin, ListGroupPlugin } from 'bootstrap-vue'
 
+Vue.use(LayoutPlugin)
+Vue.use(CardPlugin)
+Vue.use(ImagePlugin)
 Vue.use(ListGroupPlugin)
 
 export default {

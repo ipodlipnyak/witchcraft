@@ -104,7 +104,7 @@ class MediaFiles extends Model
             // save first frame from media-file to thumbnails storage
             $frame = $this->getMedia()->getFrameFromSeconds(0);
             $frame->addFilter(function (FrameFilters $filters) {
-                $filters->custom('scale=200:-1');
+                $filters->custom('scale=200:-1, crop=200:200');
             })
                 ->export()
                 ->toDisk($this->storage_disk)
@@ -129,7 +129,7 @@ class MediaFiles extends Model
      */
     public function getThumbnailUrl(): string
     {
-        return $this->thumbnail ? "/thumbs/{$this->thumbnail}" : "";
+        return $this->thumbnail ? "/thumbs/{$this->id}" : "";
     }
 
     /**
