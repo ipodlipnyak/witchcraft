@@ -13,4 +13,12 @@
 
 Route::get('/','MediaClerk@index');
 
+Route::middleware([
+    'auth:api'
+])->group(function () {
+    Route::prefix('storage')->group(function () {
+        Route::get('/thumbs/{mediaId}', 'MediaClerk@getThumb');
+    });
+});
+
 Auth::routes();

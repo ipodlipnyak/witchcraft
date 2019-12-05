@@ -17,8 +17,9 @@ class CreateMediaFilesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('user');
             $table->string('name');
-            $table->string('storage_path')->nullable();
             $table->string('storage_disk')->nullable();
+            $table->string('storage_path')->nullable();
+            $table->string('thumbnail')->nullable();
             $table->string('label')->nullable();
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Storage;
 use Pbmedia\LaravelFFMpeg\Media;
 use FFMpeg\FFProbe\DataMapping\Stream;
 use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
+use Illuminate\Support\Str;
+use FFMpeg\Filters\Frame\FrameFilters;
 
 class MediaFiles extends Model
 {
@@ -83,6 +85,51 @@ class MediaFiles extends Model
     public function uploadSession()
     {
         return $this->hasOne('App\UploadSessions', 'id', 'upload_session');
+    }
+
+    /**
+     * Return full path for thumbnail
+     *
+     * @return string
+     */
+    public function getThumbnail(): string
+    {
+        $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
+        $result = '';
+
+        // if there is no thumbnail we will try to create new
+        if ((! $this->thumbnail || ! Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) && $this->getMedia()) {
+            $thumb_name = Str::random() . ".png";
+
+            // save first frame from media-file to thumbnails storage
+            $frame = $this->getMedia()->getFrameFromSeconds(0);
+            $frame->addFilter(function (FrameFilters $filters) {
+                $filters->custom('scale=200:-1');
+            })
+                ->export()
+                ->toDisk($this->storage_disk)
+                ->save("{$thumbnails_storage}/{$thumb_name}");
+
+            $this->thumbnail = $thumb_name;
+            $this->save();
+        }
+
+        if ($this->thumbnail && Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) {
+            $storage_disk = Storage::disk($this->storage_disk)->getAdapter()->getPathPrefix();
+            $result = "{$storage_disk}{$thumbnails_storage}/{$this->thumbnail}";
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get thumbnail url
+     *
+     * @return string
+     */
+    public function getThumbnailUrl(): string
+    {
+        return $this->thumbnail ? "/thumbs/{$this->thumbnail}" : "";
     }
 
     /**
