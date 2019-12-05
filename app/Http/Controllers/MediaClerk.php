@@ -31,6 +31,8 @@ class MediaClerk extends Controller
     }
 
     /**
+     * Show thumbnail for specified media file.
+     * If current logged user is its owner
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|boolean
      */
@@ -44,8 +46,10 @@ class MediaClerk extends Controller
             return abort(404);
         }
     }
-    
+
     /**
+     * Show specified media file.
+     * If current logged user is its owner
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|boolean
      */
