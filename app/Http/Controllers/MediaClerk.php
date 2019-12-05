@@ -44,4 +44,19 @@ class MediaClerk extends Controller
             return abort(404);
         }
     }
+    
+    /**
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|boolean
+     */
+    public function getMedia()
+    {
+        /* @var $media_model MediaFiles */
+        $media_model = MediaFiles::query()->find(request('mediaId'));
+        if ($media_model && $media_model->user == Auth::user()->id && $media_model->getMedia()) {
+            return response()->file($media_model->getFullPath());
+        } else {
+            return abort(404);
+        }
+    }
 }
