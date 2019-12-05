@@ -10,6 +10,12 @@
 		:sort-by.sync="uploaded_sortBy"
       	:sort-desc.sync="uploaded_sortDesc"
       	responsive="sm">
+      	
+		<template v-slot:cell(thumb)="data">
+			<a :href="'/storage/media/' + data.item.id">
+				<b-img height="75" :src="'/storage/thumbs/' + data.item.id"></b-img>
+			</a>
+		</template>
 
 		<template v-slot:cell(upload_session.size)="data">
 			<p v-if="data.item.upload_session">
@@ -100,7 +106,7 @@ window.checkOverflow = function (el)
 	}
 
 import FileUpload from 'vue-upload-component';
-import { TablePlugin, ProgressPlugin, CollapsePlugin, ButtonPlugin, ButtonGroupPlugin } from 'bootstrap-vue';
+import { ImagePlugin, TablePlugin, ProgressPlugin, CollapsePlugin, ButtonPlugin, ButtonGroupPlugin } from 'bootstrap-vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
@@ -110,6 +116,7 @@ import {TweenMax} from "gsap/TweenMax";
 
 library.add(fas)
 
+Vue.use(ImagePlugin)
 Vue.use(TablePlugin)
 Vue.use(ProgressPlugin)
 Vue.use(CollapsePlugin)
@@ -133,6 +140,7 @@ Vue.use(ButtonGroupPlugin)
 		      
 		      filesUploaded: [],
 		      fields_uploaded: [
+		    	  { key: 'thumb', label: '', sortable: false },
 		    	  { key: 'label', label: 'Name', sortable: true },
 		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
 		          { key: 'upload_session.size', label: 'Size', sortable: true },
