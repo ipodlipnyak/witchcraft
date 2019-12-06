@@ -36,11 +36,14 @@ DB::enableQueryLog();
 
 /* @var $task Projects */
 // $task = Projects::query()->where('status', 2)->first();
-// $task = Projects::query()->first();
+$task = Projects::query()->first();
 /* @var $input ProjectInputs */
 /* @var $output MediaFiles */
 // $output = $task->output()->first();
-// $input = $task->inputs()->first();
+$input = $task->inputs()->first();
+$i_list = $task->inputs()->get();
+$result = $i_list->where('priority', 0)->first();
+// $result = 'hi';
 // $media = $input->getMedia();
 // $result = $output->getMedia();
 
@@ -58,11 +61,11 @@ DB::enableQueryLog();
 
 // $result = env('FFMPEG_OUTPUT_FOLDER');
 
-$input = MediaFiles::query()->find(287);
-$media = $input->getMedia();
-$stream = $media->getFirstStream();
-$stream = $media->getStreams()->videos()->first();
-$result = $stream->isVideo();
+// $input = MediaFiles::query()->find(287);
+// $media = $input->getMedia();
+// $stream = $media->getFirstStream();
+// $stream = $media->getStreams()->videos()->first();
+// $result = $stream->isVideo();
 
 
 // $frame = $media->getFrameFromSeconds(0);

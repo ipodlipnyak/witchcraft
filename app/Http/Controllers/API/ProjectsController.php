@@ -191,20 +191,37 @@ class ProjectsController extends Controller
      */
     public function updateInputs()
     {
-        $project_id = request('id');
-        ProjectInputs::query()->where('project', $project_id)->delete();
-
-        foreach (request('inputs') as $key => $id) {
-            $input = new ProjectInputs();
-            $input->project = $project_id;
-            $input->media_file = $id;
-            $input->priority = $key;
-            $input->save();
-        }
-
         $result = [
-            'status' => 'success'
+            'status' => 'error'
         ];
+        /* @var $project Projects */
+        $project = Projects::query()->find(request('id'));
+
+        if ($project) {
+            $first_input_old = ProjectInputs::query()->where('project', $project->id)
+                ->where('priority', 0)
+                ->first();
+            ProjectInputs::query()->where('project', $project->id)->delete();
+
+            foreach (request('inputs') as $key => $id) {
+                // If first input had been changed we should recreate output media file
+                if (($key == 0) && ($first_input_old) && ($first_input_old->media_file != $id)) {
+                    /*
+                     * @TODO It is working.
+                     * Yet there is some problem with cache in vue.
+                     * Should find how to clean it and reload thumbnail after output update.
+                     */
+                    MediaFiles::query()->find($project->output)->deleteFiles();
+                }
+                $input = new ProjectInputs();
+                $input->project = $project->id;
+                $input->media_file = $id;
+                $input->priority = $key;
+                $input->save();
+            }
+
+            $result['status'] = 'success';
+        }
 
         return response()->json($result);
     }

@@ -83,15 +83,16 @@ class MediaFilesObserver
         // }
 
         // Deleting thumbnail
-        $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
-        if ($mediaFile->thumbnail && Storage::disk($mediaFile->storage_disk)->exists("{$thumbnails_storage}/{$mediaFile->thumbnail}")) {
-            Storage::disk($mediaFile->storage_disk)->delete("{$thumbnails_storage}/{$mediaFile->thumbnail}");
-        }
+        // $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
+        // if ($mediaFile->thumbnail && Storage::disk($mediaFile->storage_disk)->exists("{$thumbnails_storage}/{$mediaFile->thumbnail}")) {
+        // Storage::disk($mediaFile->storage_disk)->delete("{$thumbnails_storage}/{$mediaFile->thumbnail}");
+        // }
 
         // Deleting media file
-        if (Storage::disk($mediaFile->storage_disk)->exists("{$mediaFile->storage_path}/{$mediaFile->name}")) {
-            Storage::disk($mediaFile->storage_disk)->delete("{$mediaFile->storage_path}/{$mediaFile->name}");
-        }
+        // if (Storage::disk($mediaFile->storage_disk)->exists("{$mediaFile->storage_path}/{$mediaFile->name}")) {
+        // Storage::disk($mediaFile->storage_disk)->delete("{$mediaFile->storage_path}/{$mediaFile->name}");
+        // }
+        $mediaFile->deleteFiles();
     }
 
     /**

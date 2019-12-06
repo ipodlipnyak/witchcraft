@@ -81,6 +81,23 @@ class MediaFiles extends Model
     }
 
     /**
+     * Delete thumbnail and media file from storage
+     */
+    public function deleteFiles()
+    {
+        // Deleting thumbnail
+        $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
+        if ($this->thumbnail && Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) {
+            Storage::disk($this->storage_disk)->delete("{$thumbnails_storage}/{$this->thumbnail}");
+        }
+
+        // Deleting media file
+        if (Storage::disk($this->storage_disk)->exists("{$this->storage_path}/{$this->name}")) {
+            Storage::disk($this->storage_disk)->delete("{$this->storage_path}/{$this->name}");
+        }
+    }
+
+    /**
      *
      * @return string
      */

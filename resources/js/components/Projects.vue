@@ -92,7 +92,7 @@ export default {
 			outputLabel: '',
 			outputFileExtension: '',
 			
-			fileExtensionsList: ['mkv', 'mp4'],
+			fileExtensionsList: ['mp4', 'mkv', 'ogg'],
 			
 			aspectWidth: 0,
 			aspectHeight: 0,
@@ -170,7 +170,7 @@ export default {
 		},
 		
 		defaultExtension() {
-			return 'mkv';
+			return 'mp4';
 		},
 		
 		defaultOutputName() {
