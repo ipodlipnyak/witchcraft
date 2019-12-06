@@ -142,7 +142,7 @@ class MediaController extends Controller
                         /* @var $media Media */
                         $media = FFmpeg::fromDisk($this->disk)->open("{$this->media_storage}/{$file_name}");
                         /* @var $stream Stream */
-                        $stream = $media->getFirstStream();
+                        $stream = $media->getStreams()->videos()->first();
 
                         $file_model = MediaFiles::createFromMedia($media);
                         $file_model->label = $upload_session->name;

@@ -43,7 +43,7 @@ class Projects extends Model
         $output_model = $this->output()->first();
 
         /* @var $output_stream Stream */
-        $output_stream = $output_media->getFirstStream();
+        $output_stream = $output_media->getStreams()->videos()->first();
 
         $input_list = ProjectInputs::query()->where('project', $this->id)->get();
 
@@ -54,7 +54,7 @@ class Projects extends Model
             $media_model = $input_model->media_file()->first();
             $input_media = $media_model->getMedia();
             /* @var $input_stream Stream */
-            $input_stream = $input_media->getFirstStream();
+            $input_stream = $input_media->getStreams()->videos()->first();
 
             // $input_too_small = ($input_model->width < $output_model->width) && ($input_model->height < $output_model->height);
 

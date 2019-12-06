@@ -10,6 +10,7 @@ use FFMpeg\FFProbe\DataMapping\Stream;
 use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 use Illuminate\Support\Str;
 use FFMpeg\Filters\Frame\FrameFilters;
+use Illuminate\Support\Facades\Log;
 
 class MediaFiles extends Model
 {
@@ -44,7 +45,15 @@ class MediaFiles extends Model
     static function createFromMedia(Media $media)
     {
         /* @var $stream Stream */
-        $stream = $media->getFirstStream();
+        try {
+            $stream = $media->getStreams()
+                ->videos()
+                ->first();
+        } catch (Exception $e) {
+            Log::warning($e->getMessage());
+            $stream = null;
+        }
+
         $file = $media->getFile();
 
         $path = explode('/', $file->getPath());
@@ -58,11 +67,15 @@ class MediaFiles extends Model
         $file_model->storage_path = $media_storage;
         $file_model->storage_disk = $disk;
         $file_model->duration = $media->getDurationInSeconds();
-        $file_model->height = $stream->getDimensions()->getHeight();
-        $file_model->width = $stream->getDimensions()->getWidth();
-        $file_model->ratio = floor($stream->getDimensions()
-            ->getRatio(true)
-            ->getValue() * 100) / 100;
+
+        if ($stream) {
+            $file_model->height = $stream->getDimensions()->getHeight();
+            $file_model->width = $stream->getDimensions()->getWidth();
+            $file_model->ratio = floor($stream->getDimensions()
+                ->getRatio(true)
+                ->getValue() * 100) / 100;
+        }
+
         $file_model->save();
         return $file_model;
     }

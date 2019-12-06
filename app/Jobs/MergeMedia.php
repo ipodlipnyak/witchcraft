@@ -69,7 +69,7 @@ class MergeMedia implements ShouldQueue
         }
         /* @var $output_model MediaFiles */
         $output_model = $task->output()->first();
-        
+
         /* @var $input_model MediaFiles */
         foreach ($task->inputs()->get() as $input_model) {
             /* @TODO work in progress */
@@ -95,16 +95,19 @@ class MergeMedia implements ShouldQueue
         if (! $output_media) {
             return false;
         }
-        
+
+        /* @TODO work in progress */
         /* @var $stream Stream */
-        $stream = $output_media->getFirstStream();
+        $stream = $output_media->getStreams()
+            ->videos()
+            ->first();
         $output_ratio = $stream->getDimensions()->getRatio();
-        
+
         /* @var $input_model MediaFiles */
         foreach ($task->inputs()->get() as $input_model) {
             $input_media = $input_model->getMedia();
         }
-        
+
         return true;
     }
 }

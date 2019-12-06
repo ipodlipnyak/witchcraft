@@ -58,9 +58,11 @@ DB::enableQueryLog();
 
 // $result = env('FFMPEG_OUTPUT_FOLDER');
 
-// $input = MediaFiles::query()->find(148);
-// $media = $input->getMedia();
-// $stream = $media->getFirstStream();
+$input = MediaFiles::query()->find(287);
+$media = $input->getMedia();
+$stream = $media->getFirstStream();
+$stream = $media->getStreams()->videos()->first();
+$result = $stream->isVideo();
 
 
 // $frame = $media->getFrameFromSeconds(0);
@@ -76,8 +78,8 @@ DB::enableQueryLog();
 
 // $result = $media->getDurationInSeconds();
 
-$input = MediaFiles::query()->find(328);
-$result = $input->delete();
+// $input = MediaFiles::query()->find(328);
+// $result = $input->delete();
 
 // $result = $input->getThumbnail();
 
