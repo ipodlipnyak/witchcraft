@@ -70,12 +70,20 @@ class MediaFilesObserver
      */
     public function deleting(MediaFiles $mediaFile)
     {
+        // Deleting associated project if this media file is projects output
         /* @var $project Projects */
         // $project = $mediaFile->projectsOutput()->first();
-
         // if ($project) {
         // $project->delete();
         // }
+
+        // Deleting thumbnail
+        $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
+        if ($mediaFile->thumbnail && Storage::disk($mediaFile->storage_disk)->exists("{$thumbnails_storage}/{$mediaFile->thumbnail}")) {
+            Storage::disk($mediaFile->storage_disk)->delete("{$thumbnails_storage}/{$mediaFile->thumbnail}");
+        }
+
+        // Deleting media file
         if (Storage::disk($mediaFile->storage_disk)->exists("{$mediaFile->storage_path}/{$mediaFile->name}")) {
             Storage::disk($mediaFile->storage_disk)->delete("{$mediaFile->storage_path}/{$mediaFile->name}");
         }
