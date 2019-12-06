@@ -60,9 +60,9 @@ class MediaFiles extends Model
         $file_model->duration = $media->getDurationInSeconds();
         $file_model->height = $stream->getDimensions()->getHeight();
         $file_model->width = $stream->getDimensions()->getWidth();
-        $file_model->ratio = $stream->getDimensions()
+        $file_model->ratio = floor($stream->getDimensions()
             ->getRatio(true)
-            ->getValue();
+            ->getValue() * 100) / 100;
         $file_model->save();
         return $file_model;
     }

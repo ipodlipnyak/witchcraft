@@ -60,7 +60,8 @@ DB::enableQueryLog();
 
 // $result = $media->get
 $input = MediaFiles::query()->find(148);
-// $media = $input->getMedia();
+$media = $input->getMedia();
+$stream = $media->getFirstStream();
 
 
 // $frame = $media->getFrameFromSeconds(0);
@@ -76,7 +77,9 @@ $input = MediaFiles::query()->find(148);
 
 // $result = $media->getDurationInSeconds();
 
-$result = $input->getThumbnail();
+$result = floor($stream->getDimensions()->getRatio(true)->getValue() * 100) / 100;
+
+// $result = $input->getThumbnail();
 
 $log = DB::getQueryLog();
 
