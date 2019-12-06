@@ -81,17 +81,23 @@ class MediaController extends Controller
                 break;
 
             case 'upload':
-                $file = $request->file('chunk');
-                $storage_path = 'chunks';
-                $file = $file->move(Storage::disk($this->disk)->getAdapter()
-                    ->getPathPrefix() . $storage_path);
+                if (MediaFiles::query()->where('upload_session', request('session_id'))
+                    ->where('start_offset', request('start_offset'))
+                    ->get()
+                    ->isEmpty()) {
 
-                $file_model = MediaFiles::createFromFile($file);
-                $file_model->storage_path = $storage_path;
-                $file_model->storage_disk = $this->disk;
-                $file_model->upload_session = request('session_id');
-                $file_model->start_offset = request('start_offset');
-                $file_model->save();
+                    $file = $request->file('chunk');
+                    $storage_path = 'chunks';
+                    $file = $file->move(Storage::disk($this->disk)->getAdapter()
+                        ->getPathPrefix() . $storage_path);
+
+                    $file_model = MediaFiles::createFromFile($file);
+                    $file_model->storage_path = $storage_path;
+                    $file_model->storage_disk = $this->disk;
+                    $file_model->upload_session = request('session_id');
+                    $file_model->start_offset = request('start_offset');
+                    $file_model->save();
+                }
 
                 $result = [
                     'status' => 'success'

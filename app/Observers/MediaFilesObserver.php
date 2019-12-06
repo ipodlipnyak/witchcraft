@@ -3,6 +3,7 @@ namespace App\Observers;
 
 use App\MediaFiles;
 use Illuminate\Support\Facades\Storage;
+use App\Projects;
 
 class MediaFilesObserver
 {
@@ -10,33 +11,32 @@ class MediaFilesObserver
     /**
      * Handle the media files "created" event.
      *
-     * @param \App\MediaFiles $mediaFiles
+     * @param \App\MediaFiles $mediaFile
      * @return void
      */
-    public function created(MediaFiles $mediaFiles)
+    public function created(MediaFiles $mediaFile)
     {
         //
     }
 
     /**
-     * Listen to the User created event.
+     * Handle the media files "updating" event.
      *
-     * @param \App\User $user
-     * @return void
+     * @param MediaFiles $mediaFile
      */
-    public function updating(MediaFiles $mediaFiles)
+    public function updating(MediaFiles $mediaFile)
     {
         // Move file if projects output name had been changed
-        if ($mediaFiles->isDirty('name')) {
-            $new_name = $mediaFiles->name;
-            $old_name = $mediaFiles->getOriginal('name');
+        if ($mediaFile->isDirty('name')) {
+            $new_name = $mediaFile->name;
+            $old_name = $mediaFile->getOriginal('name');
 
-            $project = $mediaFiles->projectsOutput()
+            $project = $mediaFile->projectsOutput()
                 ->get()
                 ->first();
 
-            if ($project && Storage::disk($mediaFiles->storage_disk)->exists("{$mediaFiles->storage_path}/{$old_name}")) {
-                Storage::disk($mediaFiles->storage_disk)->move("{$mediaFiles->storage_path}/{$old_name}", "{$mediaFiles->storage_path}/{$new_name}");
+            if ($project && Storage::disk($mediaFile->storage_disk)->exists("{$mediaFile->storage_path}/{$old_name}")) {
+                Storage::disk($mediaFile->storage_disk)->move("{$mediaFile->storage_path}/{$old_name}", "{$mediaFile->storage_path}/{$new_name}");
             }
         }
     }
@@ -44,10 +44,10 @@ class MediaFilesObserver
     /**
      * Handle the media files "updated" event.
      *
-     * @param \App\MediaFiles $mediaFiles
+     * @param \App\MediaFiles $mediaFile
      * @return void
      */
-    public function updated(MediaFiles $mediaFiles)
+    public function updated(MediaFiles $mediaFile)
     {
         //
     }
@@ -55,21 +55,39 @@ class MediaFilesObserver
     /**
      * Handle the media files "deleted" event.
      *
-     * @param \App\MediaFiles $mediaFiles
+     * @param \App\MediaFiles $mediaFile
      * @return void
      */
-    public function deleted(MediaFiles $mediaFiles)
+    public function deleted(MediaFiles $mediaFile)
     {
         //
     }
 
     /**
+     * Handle the media files "deleting" event.
+     *
+     * @param MediaFiles $mediaFile
+     */
+    public function deleting(MediaFiles $mediaFile)
+    {
+        /* @var $project Projects */
+        // $project = $mediaFile->projectsOutput()->first();
+
+        // if ($project) {
+        // $project->delete();
+        // }
+        if (Storage::disk($mediaFile->storage_disk)->exists("{$mediaFile->storage_path}/{$mediaFile->name}")) {
+            Storage::disk($mediaFile->storage_disk)->delete("{$mediaFile->storage_path}/{$mediaFile->name}");
+        }
+    }
+
+    /**
      * Handle the media files "restored" event.
      *
-     * @param \App\MediaFiles $mediaFiles
+     * @param \App\MediaFiles $mediaFile
      * @return void
      */
-    public function restored(MediaFiles $mediaFiles)
+    public function restored(MediaFiles $mediaFile)
     {
         //
     }
@@ -77,10 +95,10 @@ class MediaFilesObserver
     /**
      * Handle the media files "force deleted" event.
      *
-     * @param \App\MediaFiles $mediaFiles
+     * @param \App\MediaFiles $mediaFile
      * @return void
      */
-    public function forceDeleted(MediaFiles $mediaFiles)
+    public function forceDeleted(MediaFiles $mediaFile)
     {
         //
     }
