@@ -157,6 +157,7 @@ class MergeMedia implements ShouldQueue
 
             $format = new X264();
             $format->setAudioCodec('libmp3lame');
+            // @TODO Concatenate dont work with progress events
             $format->on('progress', function ($video, $format, $percentage) use ($task) {
                 $this->makeProgress($percentage, $task);
             });
