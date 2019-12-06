@@ -12,6 +12,11 @@ use App\MediaFiles;
 use FFMpeg\Media\Concat;
 use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 use FFMpeg\FFProbe\DataMapping\Stream;
+use FFMpeg\Filters\Video\VideoFilters;
+use FFMpeg\Coordinate\Dimension;
+use FFMpeg\Format\Video\X264;
+use Illuminate\Database\Eloquent\Collection;
+use App\ProjectInputs;
 
 class MergeMedia implements ShouldQueue
 {
@@ -34,18 +39,18 @@ class MergeMedia implements ShouldQueue
      */
     public function handle()
     {
-        $task = Projects::query()->where('status', 2)->first();
+        $task = Projects::query()->where('status', ProjectStatuses::TASK)->first();
 
-        $task->progress = ProjectStatuses::INWORK;
+        $task->status = ProjectStatuses::INWORK;
         $task->save();
 
-        if (! $this->consistencyCheck()) {
+        if (! $this->consistencyCheck($task)) {
             $task->status = ProjectStatuses::BROKEN;
             $task->save();
             die();
         }
 
-        if ($this->merge($task)) {
+        if ($this->executeTask($task)) {
             $task->status = ProjectStatuses::DONE;
             $task->save();
         } else {
@@ -61,26 +66,115 @@ class MergeMedia implements ShouldQueue
      * @return boolean
      * @see Concat
      */
-    protected function merge(Projects $task): bool
+    protected function executeTask(Projects $task): bool
     {
         $output_media = $task->getOutputMediaOrCreate();
-        if (! $output_media) {
+        $inputs_list = $task->inputs()->get();
+        if (! $output_media || $inputs_list->isEmpty()) {
             return false;
         }
+
         /* @var $output_model MediaFiles */
         $output_model = $task->output()->first();
 
         /* @var $input_model MediaFiles */
-        foreach ($task->inputs()->get() as $input_model) {
-            /* @TODO work in progress */
-            $input_model->getFullPath();
-            $input_media = $input_model->getMedia();
+        if ($inputs_list->count() == 1) {
+            $input_model = $inputs_list->first();
+            $this->convertMedia($input_model, $task);
+        } elseif ($inputs_list->count() > 1) {
+            /*
+             * @TODO work in progress:
+             * - check if covertMedia and concatenate methods are working properly
+             * - maybe maybe should generate new tasks to convert every input to same codec before concatenate them
+             */
+            $this->concatenate($inputs_list, $task);
+            // foreach ($task->inputs()->get() as $input_model) {
+            // $input_model->getFullPath();
+            // $input_media = $input_model->getMedia();
+            // }
         }
 
-        $task->progress = 1;
-        $task->save();
+        // $task->progress = 1;
+        // $task->save();
 
         return true;
+    }
+
+    /**
+     * Simple ffmpegs convertion with resize filter
+     *
+     * @param MediaFiles $input_model
+     * @param Projects $task
+     */
+    protected function convertMedia(MediaFiles $input_model, Projects $task)
+    {
+        $output_model = $task->output()->first();
+        $input_media = $input_model->getMedia();
+        $output_model->deleteFiles();
+
+        $format = new X264();
+        $format->setAudioCodec('libmp3lame');
+        $format->on('progress', function ($video, $format, $percentage) use ($task) {
+            $this->makeProgress($percentage, $task);
+        });
+
+        $input_media->addFilter(function (VideoFilters $filters) use ($output_model) {
+            $filters->resize(new Dimension($output_model->width, $output_model->height));
+        })
+            ->export()
+            ->toDisk($output_model->storage_disk)
+            ->inFormat($format)
+            ->save("{$output_model->storage_path}/{$output_model->name}");
+    }
+
+    /**
+     * Concatenate input list
+     *
+     * @param Collection $inputs_list
+     * @param Projects $task
+     */
+    protected function concatenate(Collection $inputs_list, Projects $task)
+    {
+        /* @var $output_model MediaFiles */
+        $output_model = $task->output()->first();
+        $output_model->deleteFiles();
+
+        $sources = [];
+        /* @var $input_model MediaFiles */
+        foreach ($inputs_list as $input_model) {
+            array_push($sources, $input_model->getFullPath());
+        }
+
+        if (count($sources) > 0) {
+            /* @var $first_input_model MediaFiles */
+            $first_input_model = ProjectInputs::query()->where('project', $task->id)
+                ->where('priority', 0)
+                ->first()
+                ->media_file()
+                ->first();
+
+            $first_input_media = $first_input_model->getMedia();
+
+            $format = new X264();
+            $format->setAudioCodec('libmp3lame');
+            $format->on('progress', function ($video, $format, $percentage) use ($task) {
+                $this->makeProgress($percentage, $task);
+            });
+            $first_input_media->concat($sources)->saveFromDifferentCodecs($format, $output_model->getFullPath());
+        }
+    }
+
+    /**
+     * Should be called on ffmpegs progress event
+     *
+     * @param int $percentage
+     * @param Projects $task
+     */
+    protected function makeProgress(int $percentage, Projects $task)
+    {
+        // @TODO WebSocket-server call should be here
+        $task->progress = $percentage;
+        $task->save();
     }
 
     /**

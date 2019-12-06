@@ -98,6 +98,7 @@ class MediaFiles extends Model
     }
 
     /**
+     * Return full path for a media file in local storage
      *
      * @return string
      */
