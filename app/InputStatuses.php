@@ -13,4 +13,6 @@ class InputStatuses extends Model
     const BROKEN = 2;
 
     const WRONG_RATIO = 3;
+
+    const WRONG_CODEC = 4;
 }

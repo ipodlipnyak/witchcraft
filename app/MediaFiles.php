@@ -11,6 +11,7 @@ use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 use Illuminate\Support\Str;
 use FFMpeg\Filters\Frame\FrameFilters;
 use Illuminate\Support\Facades\Log;
+use FFMpeg\Media\Video;
 
 class MediaFiles extends Model
 {
@@ -78,6 +79,95 @@ class MediaFiles extends Model
 
         $file_model->save();
         return $file_model;
+    }
+
+    /**
+     * Check audio and video streams for similarities.
+     *
+     * @param int|MediaFiles $compare_to
+     *            id or model of a media file to compare
+     * @return bool
+     */
+    public function checkIfSameCodec($compare_to): bool
+    {
+        /* @var $compare_to_model MediaFiles */
+        if (gettype($compare_to) == 'integer') {
+            $compare_to_model = MediaFiles::query()->find($compare_to);
+        } elseif ((gettype($compare_to) == 'object') && (get_class($compare_to) == MediaFiles::class)) {
+            $compare_to_model = $compare_to;
+        }
+        /* @var $compare_to_media Video */
+        $compare_to_media = $compare_to_model->getMedia();
+        $compare_to_video = $compare_to_media->getStreams()
+            ->videos()
+            ->first();
+        $compare_to_audio = $compare_to_media->getStreams()
+            ->audios()
+            ->first();
+
+        /* @var $this_media Video */
+        $this_media = $this->getMedia();
+        $this_video = $this_media->getStreams()
+            ->videos()
+            ->first();
+        $this_audio = $this_media->getStreams()
+            ->audios()
+            ->first();
+
+        // What we should check for similarities
+        $video_params_list = [
+            'codec_name',
+            'avg_frame_rate'
+        ];
+        $audio_params_list = [
+            'codec_name',
+            'max_bit_rate'
+        ];
+
+        foreach ($video_params_list as $property) {
+            if ($this_video->get($property) != $compare_to_video->get($property)) {
+                return false;
+            }
+        }
+
+        foreach ($audio_params_list as $property) {
+            if ($this_audio->get($property) != $compare_to_audio->get($property)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if ratio same as for compared model
+     *
+     * @param int|MediaFiles $compare_to
+     *            id or model of a media file to compare
+     * @return bool
+     */
+    public function checkIfSameRatio($compare_to): bool
+    {
+        /* @var $compare_to_model MediaFiles */
+        if (gettype($compare_to) == 'integer') {
+            $compare_to_model = MediaFiles::query()->find($compare_to);
+        } elseif ((gettype($compare_to) == 'object') && (get_class($compare_to) == MediaFiles::class)) {
+            $compare_to_model = $compare_to;
+        }
+
+        /* @var $this_media Video */
+        $this_media = $this->getMedia();
+        $this_video = $this_media->getStreams()
+            ->videos()
+            ->first();
+
+        if ($this_video->getDimensions()
+            ->getRatio()
+            ->calculateHeight($compare_to_model->width) != $compare_to_model->height) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

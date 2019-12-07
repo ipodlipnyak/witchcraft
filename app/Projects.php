@@ -7,6 +7,7 @@ use Pbmedia\LaravelFFMpeg\FFMpegFacade as FFMpeg;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use FFMpeg\FFProbe\DataMapping\Stream;
+use FFMpeg\Media\Video;
 
 class Projects extends Model
 {
@@ -39,30 +40,25 @@ class Projects extends Model
      */
     public function consistencyCheck(): bool
     {
-        $output_media = $this->getOutputMediaOrCreate();
         $output_model = $this->output()->first();
-
-        /* @var $output_stream Stream */
-        $output_stream = $output_media->getStreams()->videos()->first();
+        $first_media_model = $this->getFirstInput();
+        /* @var $output_media Video */
+        $output_media = $first_media_model->getMedia();
 
         $input_list = ProjectInputs::query()->where('project', $this->id)->get();
 
         $brocken_count = 0;
         /* @var $input_model ProjectInputs */
         foreach ($input_list as $input_model) {
-            /* @var $input_model MediaFiles */
+            /* @var $media_model MediaFiles */
             $media_model = $input_model->media_file()->first();
-            $input_media = $media_model->getMedia();
-            /* @var $input_stream Stream */
-            $input_stream = $input_media->getStreams()->videos()->first();
 
-            // $input_too_small = ($input_model->width < $output_model->width) && ($input_model->height < $output_model->height);
-
-            if ($input_stream->getDimensions()
-                ->getRatio()
-                ->calculateHeight($output_model->width) != $output_model->height) {
-
+            if ($media_model->checkIfSameRatio($output_model)) {
                 $input_model->status = InputStatuses::WRONG_RATIO;
+                $input_model->save();
+                $brocken_count ++;
+            } elseif (count($input_list) > 1 && $media_model->checkIfSameCodec($first_media_model)) {
+                $input_model->status = InputStatuses::WRONG_CODEC;
                 $input_model->save();
                 $brocken_count ++;
             } else {
@@ -72,6 +68,23 @@ class Projects extends Model
         }
 
         return $brocken_count == 0;
+    }
+
+    /**
+     * Return first input, eg with priority 0
+     *
+     * @return MediaFiles|NULL
+     */
+    public function getFirstInput(): ?MediaFiles
+    {
+        $input_id = ProjectInputs::query()->where('project', $this->id)
+            ->where('priority', 0)
+            ->value('media_file');
+        if ($input_id) {
+            return MediaFiles::query()->find($input_id);
+        }
+
+        return null;
     }
 
     /**

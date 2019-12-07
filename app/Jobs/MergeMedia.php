@@ -17,6 +17,8 @@ use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Database\Eloquent\Collection;
 use App\ProjectInputs;
+use FFMpeg\Media\Video;
+use FFMpeg\Media\AbstractStreamableMedia;
 
 class MergeMedia implements ShouldQueue
 {
@@ -88,6 +90,8 @@ class MergeMedia implements ShouldQueue
              * - maybe maybe should generate new tasks to convert every input to same codec before concatenate them
              */
             $this->concatenate($inputs_list, $task);
+            $task->progress = 100;
+            $task->save();
             // foreach ($task->inputs()->get() as $input_model) {
             // $input_model->getFullPath();
             // $input_media = $input_model->getMedia();
@@ -153,11 +157,19 @@ class MergeMedia implements ShouldQueue
                 ->media_file()
                 ->first();
 
+            /* @var $first_input_media Video */
             $first_input_media = $first_input_model->getMedia();
 
             $format = new X264();
             $format->setAudioCodec('libmp3lame');
-            // @TODO Concatenate dont work with progress events
+            /*
+             * @TODO Concatenation are fine.
+             * But progress events not working.
+             * Should try saveFromSameCodecs method
+             * while creating separated tasks for convertion.
+             * In that case it would be possible to check the progress,
+             * and concatenation tasks wouldn't take much time
+             */
             $format->on('progress', function ($video, $format, $percentage) use ($task) {
                 $this->makeProgress($percentage, $task);
             });
@@ -191,16 +203,24 @@ class MergeMedia implements ShouldQueue
             return false;
         }
 
-        /* @TODO work in progress */
-        /* @var $stream Stream */
-        $stream = $output_media->getStreams()
-            ->videos()
-            ->first();
-        $output_ratio = $stream->getDimensions()->getRatio();
+        /* @TODO Work in progress */
+        $task->consistencyCheck();
+
+        $output_model = $task->output()->first();
+        $first_input_model = $task->getFirstInput();
+        /* @var $output_media Video */
+        $output_media = $first_input_model->getMedia();
 
         /* @var $input_model MediaFiles */
         foreach ($task->inputs()->get() as $input_model) {
-            $input_media = $input_model->getMedia();
+            /* @var $input_media Video */
+            // $input_media = $input_model->getMedia();
+            // $input_video_stream = $input_media->getStreams()
+            // ->videos()
+            // ->first();
+            // $input_audio_stream = $input_media->getStreams()
+            // ->audios()
+            // ->first();
         }
 
         return true;
