@@ -1,4 +1,7 @@
 *.swp
+.project
+.buildpath
+/.settings/*
 /node_modules
 /public/hot
 /public/storage
