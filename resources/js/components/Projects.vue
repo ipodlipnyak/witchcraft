@@ -59,11 +59,21 @@
 <!-- Projects listing -->
 <div v-else>
 	<div>
-		<b-button block squared @click="selectProject(0)" variant="primary">New project</b-button>
+		<b-button block squared @click="selectProject(0)" variant="primary" class="mb-2">New project</b-button>
 	</div>
+	<!-- 
 	<div v-for="(project, index) in projects" :key="project.id">
 		<b-button block squared @click="selectProject(project.id)" variant="primary">{{ project.output.label }}</b-button>
 	</div>
+	 -->
+	
+	
+	<masonry
+  		cols="2"
+  		gutter="10">
+  		<project-entry v-for="(project, index) in projects" v-on:select-project="selectProject(project.id)" :project="project" :key="project.id"></project-entry>
+	</masonry>
+	
 </div>
 
 
@@ -72,7 +82,11 @@
 
 <script>
 import ProjectInputs from './ProjectInputs';
+import ProjectEntry from './ProjectEntry';
 import { AlertPlugin, InputGroupPlugin, FormInputPlugin, ButtonPlugin, ListGroupPlugin, CardPlugin, DropdownPlugin } from 'bootstrap-vue';
+
+import VueMasonry from 'vue-masonry-css'
+Vue.use(VueMasonry)
 
 Vue.use(AlertPlugin)
 Vue.use(InputGroupPlugin)
@@ -184,6 +198,7 @@ export default {
 		
 	components: {
 		ProjectInputs,
+		ProjectEntry,
 	},
 		
 	mounted() {

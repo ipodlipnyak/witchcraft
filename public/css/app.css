@@ -13466,6 +13466,10 @@ input[type=color].form-control:disabled {
   border-radius: 0;
 }
 
+body {
+  background-color: #222222;
+}
+
 #app {
   overflow: hidden;
 }
@@ -13496,5 +13500,11 @@ input[type=color].form-control:disabled {
 .slider-content {
   -webkit-box-flex: 1;
           flex: 1;
+}
+
+.input-group .input-group-text,
+.input-group .input-group-append,
+.btn {
+  border-radius: 0;
 }
 

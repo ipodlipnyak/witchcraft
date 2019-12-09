@@ -269,4 +269,10 @@ export default {
 .list-group-item i {
   cursor: pointer;
 }
+
+.card {
+	border-radius: 0;
+	border: none;
+}
+
 </style>

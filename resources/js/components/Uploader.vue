@@ -8,8 +8,7 @@
   		:items="filesUploaded" 
   		:fields="fields_uploaded"
 		:sort-by.sync="uploaded_sortBy"
-      	:sort-desc.sync="uploaded_sortDesc"
-      	responsive="sm">
+      	:sort-desc.sync="uploaded_sortDesc">
       	
 		<template v-slot:cell(thumb)="data">
 			<a :href="'/storage/media/' + data.item.id">
@@ -32,9 +31,11 @@
 
   </b-collapse>
 
+<!-- 
 <hr v-if="filesUploaded.length > 0"/>
+ -->
 
-  <b-table v-if="files.length > 0" striped hover :items="files" :fields="fields_files">
+  <b-table id="files-to-upload" v-if="files.length > 0" striped hover :items="files" :fields="fields_files">
 		<template v-slot:cell(size)="data">
 			{{ formatBytes(data.value) }}
 		</template>
@@ -136,13 +137,17 @@ Vue.use(ButtonGroupPlugin)
 			  
 		      files: [],
 
-		      fields_files: ['name','type','size','progress'],
+		      fields_files: [
+		    	  'name',
+// 		    	  'type',
+		    	  'size',
+		    	  'progress'],
 		      
 		      filesUploaded: [],
 		      fields_uploaded: [
 		    	  { key: 'thumb', label: '', sortable: false },
 		    	  { key: 'label', label: 'Name', sortable: true },
-		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
+// 		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
 		          { key: 'upload_session.size', label: 'Size', sortable: true },
 		          { key: 'delete', label: '', sortable: false },
 		          ],
@@ -295,4 +300,7 @@ Vue.use(ButtonGroupPlugin)
 </script>
 
 <style scoped>
+#uploaded-files, #files-to-upload {
+	background: white;
+}
 </style>
