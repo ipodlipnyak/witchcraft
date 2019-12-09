@@ -39,6 +39,8 @@ Route::middleware([
         Route::get('/{id}/files', 'API\ProjectsController@getAvailableFiles');
         Route::get('/{id}/inputs', 'API\ProjectsController@getInputs');
         Route::post('/{id}/inputs', 'API\ProjectsController@updateInputs');
+        Route::post('/{id}/start', 'API\ProjectsController@startProject');
+        Route::post('/{id}/stop', 'API\ProjectsController@stopProject');
         Route::delete('/{id}', 'API\ProjectsController@destroy');
     });
 });

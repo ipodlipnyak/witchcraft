@@ -10,6 +10,7 @@ use App\ProjectInputs;
 use phpDocumentor\Reflection\Project;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\ProjectStatuses;
 
 class ProjectsController extends Controller
 {
@@ -266,6 +267,52 @@ class ProjectsController extends Controller
             }
 
             if ($output->save()) {
+                $result['status'] = 'success';
+            }
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * Set up new task for ffmpeg convertion
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function startProject()
+    {
+        $result = [
+            'status' => 'error'
+        ];
+
+        /* @var $project Projects */
+        $project = Projects::query()->find(request('id'));
+        $project->status = ProjectStatuses::TASK;
+
+        if ($project->save()) {
+            $result['status'] = 'success';
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * Revert project from task to template state
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function stopProject()
+    {
+        $result = [
+            'status' => 'error'
+        ];
+
+        /* @var $project Projects */
+        $project = Projects::query()->find(request('id'));
+        if ($project->status == ProjectStatuses::TASK) {
+            $project->status = ProjectStatuses::TEMPLATE;
+
+            if ($project->save()) {
                 $result['status'] = 'success';
             }
         }
