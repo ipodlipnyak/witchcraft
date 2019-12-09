@@ -33,6 +33,25 @@ class Projects extends Model
     }
 
     /**
+     * Find out if there is some inputs with different codecs then the first one of them
+     *
+     * @return bool
+     */
+    public function isInputsFromDifferentCodecs(): bool
+    {
+        $this->consistencyCheck();
+
+        $input_list = ProjectInputs::query()->where('project', $this->id)->get();
+        if (count($input_list) > 1) {
+            return $input_list->where('status', InputStatuses::WRONG_CODEC)
+                ->get()
+                ->isNotEmpty();
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Check if every project inputs coherent with each other
      *
      * @param Projects $task

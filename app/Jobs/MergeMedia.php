@@ -86,7 +86,7 @@ class MergeMedia implements ShouldQueue
         } elseif ($inputs_list->count() > 1) {
             /*
              * @TODO work in progress:
-             * - check if covertMedia and concatenate methods are working properly
+             * + check if covertMedia and concatenate methods are working properly
              * - maybe maybe should generate new tasks to convert every input to same codec before concatenate them
              */
             $this->concatenate($inputs_list, $task);
@@ -160,8 +160,6 @@ class MergeMedia implements ShouldQueue
             /* @var $first_input_media Video */
             $first_input_media = $first_input_model->getMedia();
 
-            $format = new X264();
-            $format->setAudioCodec('libmp3lame');
             /*
              * @TODO Concatenation are fine.
              * But progress events not working.
@@ -170,10 +168,16 @@ class MergeMedia implements ShouldQueue
              * In that case it would be possible to check the progress,
              * and concatenation tasks wouldn't take much time
              */
-            $format->on('progress', function ($video, $format, $percentage) use ($task) {
-                $this->makeProgress($percentage, $task);
-            });
-            $first_input_media->concat($sources)->saveFromDifferentCodecs($format, $output_model->getFullPath());
+            if ($task->isInputsFromDifferentCodecs()) {
+                $format = new X264();
+                $format->setAudioCodec('libmp3lame');
+                $format->on('progress', function ($video, $format, $percentage) use ($task) {
+                    $this->makeProgress($percentage, $task);
+                });
+                $first_input_media->concat($sources)->saveFromDifferentCodecs($format, $output_model->getFullPath());
+            } else {
+                $first_input_media->concat($sources)->saveFromSameCodecs($output_model->getFullPath());
+            }
         }
     }
 
@@ -204,7 +208,7 @@ class MergeMedia implements ShouldQueue
         }
 
         /* @TODO Work in progress */
-        $task->consistencyCheck();
+        // $task->consistencyCheck();
 
         $output_model = $task->output()->first();
         $first_input_model = $task->getFirstInput();
