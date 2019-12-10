@@ -218,12 +218,21 @@ class MediaFiles extends Model
         $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
         $result = '';
 
+        /* @var $thumb_source MediaFiles */
+        if ($this->projectsOutput()->get()->isNotEmpty()) {
+            /* @var $project Projects */
+            $project = $this->projectsOutput()->first();
+            $thumb_source = $project->getFirstInput();
+        } else {
+            $thumb_source = $this;
+        }
+
         // if there is no thumbnail we will try to create new
-        if ((! $this->thumbnail || ! Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) && $this->getMedia()) {
+        if ((! $this->thumbnail || ! Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) && $thumb_source->getMedia()) {
             $thumb_name = Str::random() . ".png";
 
             // save first frame from media-file to thumbnails storage
-            $frame = $this->getMedia()->getFrameFromSeconds(0);
+            $frame = $thumb_source->getMedia()->getFrameFromSeconds(0);
             $frame->addFilter(function (FrameFilters $filters) {
                 $filters->custom('scale=200:-1, crop=200:200');
             })

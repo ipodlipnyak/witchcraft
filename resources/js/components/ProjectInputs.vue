@@ -1,5 +1,8 @@
 <template>
-<div class="row pt-4">
+<div class="pt-4">
+	<simplebar class="bar" data-simplebar-auto-hide="false">
+	<div class="row">
+  
 	<div class="col-6">
 		<div class="card">
 			<div class="card-header">
@@ -97,12 +100,18 @@
 			</draggable>
 		</div>
 	</div>
+	
+	</div>
+	</simplebar>
 </div>
 </template>
 
 <script>
 import draggable from 'vuedraggable'
 import { LayoutPlugin, CardPlugin, ImagePlugin, ListGroupPlugin } from 'bootstrap-vue'
+
+import simplebar from 'simplebar-vue';
+import 'simplebar/dist/simplebar.min.css';
 
 Vue.use(LayoutPlugin)
 Vue.use(CardPlugin)
@@ -244,6 +253,7 @@ export default {
 	
     components: {
         draggable,
+        simplebar
     },
 }
 </script>
@@ -273,6 +283,11 @@ export default {
 .card {
 	border-radius: 0;
 	border: none;
+}
+
+.bar {
+	height: 60vh;
+	overflow-x: hidden;
 }
 
 </style>
