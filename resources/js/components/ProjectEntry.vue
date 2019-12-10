@@ -8,7 +8,7 @@
                         :id="'player-' + project.id" 
                         width="100%" 
                         controls>
-                <source :src="'/storage/media/' + project.output.id" type="video/mp4" />
+                <source :src="'/storage/media/' + project.output.id" :type="projectEntry.mime_type" />
             </video>
             <b-card-img v-else v-on:click="selectProject()" :src="'/storage/thumbs/' + project.output.id" class="rounded-0"></b-card-img>
             <b-card-body>
@@ -19,7 +19,14 @@
             <b-button v-if="projectEntry.status == 1" block squared @click="startProject()" variant="info">Start</b-button>
             <b-button v-if="projectEntry.status == 2" block squared @click="stopProject()" variant="danger">Stop</b-button>
             <b-progress height="2rem" v-else-if="projectEntry.status == 3" :value="projectEntry.progress" :max="100" show-progress animated></b-progress>
-            <b-button v-if="projectEntry.status == 4" block squared @click="downloadProject()" variant="success">Download</b-button>
+            <b-button v-if="projectEntry.status == 4" 
+            	block 
+            	squared 
+            	:href="'/storage/media/' + project.output.id" 
+            	:download="download_name" 
+            	variant="success">
+            	Download
+            </b-button>
         </b-card>
 
     </div>
@@ -48,11 +55,14 @@ export default {
 	},
 	
 	computed: {
-		//
+		download_name() {
+			return this.projectEntry.output.label + '.' + this.projectEntry.file_extension
+		},
 	},
 	
 	mounted() {
 		this.projectEntry = this.project;
+		this.refreshProjectData();
 	},
 	
 	watch: {

@@ -82,6 +82,36 @@ class MediaFiles extends Model
     }
 
     /**
+     * Returns the mime type of the file
+     *
+     * @return string|NULL
+     */
+    public function getMimeType(): ?string
+    {
+        if (Storage::disk($this->storage_disk)->exists("{$this->storage_path}/{$this->name}")) {
+            $file = new File($this->getFullPath());
+            return $file->getMimeType();
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the file extension
+     *
+     * @return string|NULL
+     */
+    public function getFileExtension(): ?string
+    {
+        if (Storage::disk($this->storage_disk)->exists("{$this->storage_path}/{$this->name}")) {
+            $file = new File($this->getFullPath());
+            return $file->getExtension();
+        }
+
+        return null;
+    }
+
+    /**
      * Check audio and video streams for similarities.
      *
      * @param int|MediaFiles $compare_to
@@ -219,7 +249,9 @@ class MediaFiles extends Model
         $result = '';
 
         /* @var $thumb_source MediaFiles */
-        if ($this->projectsOutput()->get()->isNotEmpty()) {
+        if ($this->projectsOutput()
+            ->get()
+            ->isNotEmpty()) {
             /* @var $project Projects */
             $project = $this->projectsOutput()->first();
             $thumb_source = $project->getFirstInput();

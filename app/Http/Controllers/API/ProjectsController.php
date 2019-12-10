@@ -88,6 +88,11 @@ class ProjectsController extends Controller
             ->with('inputs')
             ->find(request('id'));
 
+        /* @var $output MediaFiles */
+        $output = $project->output()->first();
+        $project['mime_type'] = $output->getMimeType();
+        $project['file_extension'] = $output->getFileExtension();
+
         foreach ($project['inputs'] as &$input) {
             $input['priority'] = ProjectInputs::query()->where('project', $project['id'])
                 ->where('media_file', $input['id'])
