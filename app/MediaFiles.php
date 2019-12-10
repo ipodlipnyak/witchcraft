@@ -228,13 +228,13 @@ class MediaFiles extends Model
         }
 
         // if there is no thumbnail we will try to create new
-        if ((! $this->thumbnail || ! Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) && $thumb_source->getMedia()) {
+        if ((! $this->thumbnail || ! Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) && $thumb_source && $thumb_source->getMedia()) {
             $thumb_name = Str::random() . ".png";
 
             // save first frame from media-file to thumbnails storage
             $frame = $thumb_source->getMedia()->getFrameFromSeconds(0);
             $frame->addFilter(function (FrameFilters $filters) {
-                $filters->custom('scale=200:-1, crop=200:200');
+                $filters->custom('scale=400:-1, crop=400:400');
             })
                 ->export()
                 ->toDisk($this->storage_disk)
@@ -244,9 +244,12 @@ class MediaFiles extends Model
             $this->save();
         }
 
+        $storage_disk = Storage::disk($this->storage_disk)->getAdapter()->getPathPrefix();
         if ($this->thumbnail && Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) {
-            $storage_disk = Storage::disk($this->storage_disk)->getAdapter()->getPathPrefix();
             $result = "{$storage_disk}{$thumbnails_storage}/{$this->thumbnail}";
+        } else {
+            $placeholder = env('IMG_PLACEHOLDER', 'placeholder.svg');
+            $result = "{$storage_disk}{$placeholder}";
         }
 
         return $result;

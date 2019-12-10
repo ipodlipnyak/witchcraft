@@ -86,19 +86,17 @@ class MergeMedia implements ShouldQueue
         } elseif ($inputs_list->count() > 1) {
             /*
              * @TODO work in progress:
-             * + check if covertMedia and concatenate methods are working properly
+             * + check if convertMedia and concatenate methods are working properly
              * - maybe maybe should generate new tasks to convert every input to same codec before concatenate them
              */
             $this->concatenate($inputs_list, $task);
-            $task->progress = 100;
-            $task->save();
             // foreach ($task->inputs()->get() as $input_model) {
             // $input_model->getFullPath();
             // $input_media = $input_model->getMedia();
             // }
         }
 
-        // $task->progress = 1;
+        // $task->progress = 100;
         // $task->save();
 
         return true;

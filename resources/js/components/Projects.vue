@@ -71,7 +71,13 @@
 	<masonry
   		cols="2"
   		gutter="10">
-  		<project-entry v-for="(project, index) in projects" v-on:select-project="selectProject(project.id)" :project="project" :key="project.id"></project-entry>
+  		<project-entry 
+  			v-for="(project, index) in projects" 
+  			v-on:select-project="selectProject(project.id)" 
+  			:project="project" 
+  			:key="project.id"
+  			:api-token="apiToken">
+  		</project-entry>
 	</masonry>
 	
 </div>
