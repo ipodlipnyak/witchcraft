@@ -67,7 +67,7 @@
 	</div>
 	 -->
 	
-	
+	<simplebar class="bar" data-simplebar-auto-hide="false">
 	<masonry
   		cols="2"
   		gutter="10">
@@ -79,6 +79,7 @@
   			:api-token="apiToken">
   		</project-entry>
 	</masonry>
+	</simplebar>
 	
 </div>
 
@@ -90,6 +91,9 @@
 import ProjectInputs from './ProjectInputs';
 import ProjectEntry from './ProjectEntry';
 import { AlertPlugin, InputGroupPlugin, FormInputPlugin, ButtonPlugin, ListGroupPlugin, CardPlugin, DropdownPlugin } from 'bootstrap-vue';
+
+import simplebar from 'simplebar-vue';
+import 'simplebar/dist/simplebar.min.css';
 
 import VueMasonry from 'vue-masonry-css'
 Vue.use(VueMasonry)
@@ -205,6 +209,7 @@ export default {
 	components: {
 		ProjectInputs,
 		ProjectEntry,
+		simplebar,
 	},
 		
 	mounted() {
@@ -323,4 +328,8 @@ export default {
 </script>
 
 <style scoped>
+.bar {
+	height: 80vh;
+	overflow-x: hidden;
+}
 </style>
