@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Collection;
 use App\ProjectInputs;
 use FFMpeg\Media\Video;
 use FFMpeg\Media\AbstractStreamableMedia;
+use App\Events\FFmpegProgress;
+use App\Events\ProjectUpdate;
 
 class MergeMedia implements ShouldQueue
 {
@@ -43,21 +45,26 @@ class MergeMedia implements ShouldQueue
     {
         $task = Projects::query()->where('status', ProjectStatuses::TASK)->first();
 
-        $task->status = ProjectStatuses::INWORK;
-        $task->save();
+        if ($task) {
+            $task->status = ProjectStatuses::INWORK;
+            $task->save();
 
-        if (! $this->consistencyCheck($task)) {
-            $task->status = ProjectStatuses::BROKEN;
-            $task->save();
-            die();
-        }
+            if (! $this->consistencyCheck($task)) {
+                $task->status = ProjectStatuses::BROKEN;
+                $task->save();
+                die();
+            }
 
-        if ($this->executeTask($task)) {
-            $task->status = ProjectStatuses::DONE;
-            $task->save();
-        } else {
-            $task->status = ProjectStatuses::BROKEN;
-            $task->save();
+            if ($this->executeTask($task)) {
+                $task->status = ProjectStatuses::DONE;
+                $task->save();
+            } else {
+                $task->status = ProjectStatuses::BROKEN;
+                $task->save();
+            }
+            
+            // WebSocket broadcast
+            broadcast(new ProjectUpdate($task));
         }
     }
 
@@ -187,9 +194,11 @@ class MergeMedia implements ShouldQueue
      */
     protected function makeProgress(int $percentage, Projects $task)
     {
-        // @TODO WebSocket-server call should be here
         $task->progress = $percentage;
         $task->save();
+
+        // WebSocket broadcast
+        broadcast(new ProjectUpdate($task));
     }
 
     /**

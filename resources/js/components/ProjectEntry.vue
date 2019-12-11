@@ -61,8 +61,17 @@ export default {
 	},
 	
 	mounted() {
+		var self = this;
+		
 		this.projectEntry = this.project;
 		this.refreshProjectData();
+		
+		// socket.io SUBSCRIBE to 'project.{id}' channel
+		Echo.private(`project.${this.project.id}`)
+			.listen('.App\\Events\\ProjectUpdate', (e) => {
+				self.projectEntry.progress = e.project.progress;
+				self.projectEntry.status = e.project.status;
+	    });
 	},
 	
 	watch: {

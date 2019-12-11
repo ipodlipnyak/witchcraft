@@ -1,3 +1,5 @@
+laravel-echo-server.json
+laravel-echo-server.lock
 *.swp
 .project
 .buildpath
