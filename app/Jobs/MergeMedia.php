@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\ProjectInputs;
 use FFMpeg\Media\Video;
 use FFMpeg\Media\AbstractStreamableMedia;
-use App\Events\FFmpegProgress;
 use App\Events\ProjectUpdate;
 
 class MergeMedia implements ShouldQueue

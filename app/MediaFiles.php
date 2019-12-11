@@ -265,10 +265,31 @@ class MediaFiles extends Model
 
             // save first frame from media-file to thumbnails storage
             $frame = $thumb_source->getMedia()->getFrameFromSeconds(0);
-            $frame->addFilter(function (FrameFilters $filters) {
-                $filters->custom('scale=400:-1, crop=400:400');
-            })
-                ->export()
+
+            $thumb_source_dimensions = $thumb_source->getMedia()
+                ->getStreams()
+                ->videos()
+                ->first()
+                ->getDimensions();
+            $height = $thumb_source_dimensions->getHeight();
+            $width = $thumb_source_dimensions->getWidth();
+            $max_scale = 400;
+
+            $scale_size = min([
+                $height,
+                $width,
+                $max_scale
+            ]);
+            // thumb should not been scaled smaller then 400 px
+            $filter = $max_scale == $scale_size ? "scale=$scale_size:-1, crop=$scale_size:$scale_size" : "crop=$scale_size:$scale_size";
+
+            if ($filter) {
+                $frame->addFilter(function (FrameFilters $filters) use ($filter) {
+                    $filters->custom($filter);
+                });
+            }
+
+            $frame->export()
                 ->toDisk($this->storage_disk)
                 ->save("{$thumbnails_storage}/{$thumb_name}");
 
