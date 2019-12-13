@@ -47,7 +47,7 @@ class MergeMedia implements ShouldQueue
         if ($task) {
             $task->status = ProjectStatuses::INWORK;
             $task->save();
-            
+
             // WebSocket broadcast
             broadcast(new ProjectUpdate($task));
 
@@ -65,7 +65,7 @@ class MergeMedia implements ShouldQueue
                 $task->status = ProjectStatuses::BROKEN;
                 $task->save();
             }
-            
+
             broadcast(new ProjectUpdate($task));
         }
     }
@@ -104,6 +104,10 @@ class MergeMedia implements ShouldQueue
             // $input_media = $input_model->getMedia();
             // }
         }
+
+        $output_model->refresh()
+            ->refreshMediaData()
+            ->save();
 
         // $task->progress = 100;
         // $task->save();

@@ -70,8 +70,14 @@ class MediaFiles extends Model
         $file_model->duration = $media->getDurationInSeconds();
 
         if ($stream) {
-            $file_model->height = $stream->getDimensions()->getHeight();
-            $file_model->width = $stream->getDimensions()->getWidth();
+            if ($stream->get('tags') && array_key_exists('rotate', $stream->get('tags')) && $stream->get('tags')['rotate'] == 90) {
+                $file_model->height = $stream->getDimensions()->getWidth();
+                $file_model->width = $stream->getDimensions()->getHeight();
+            } else {
+                $file_model->height = $stream->getDimensions()->getHeight();
+                $file_model->width = $stream->getDimensions()->getWidth();
+            }
+
             $file_model->ratio = floor($stream->getDimensions()
                 ->getRatio(true)
                 ->getValue() * 100) / 100;
@@ -79,6 +85,41 @@ class MediaFiles extends Model
 
         $file_model->save();
         return $file_model;
+    }
+
+    /**
+     * Refresh params with media file data
+     *
+     * @return \App\MediaFiles
+     */
+    public function refreshMediaData()
+    {
+        /* @var $media Video */
+        $media = $this->getMedia();
+
+        // should clean cache before it would be possible to check if file had been updated
+        $cache = $media->getFFProbe()->getCache();
+        $cache_id = "-show_streams-{$this->getFullPath()}";
+        $cache->delete($cache_id);
+
+        $stream = $media->getStreams()
+            ->videos()
+            ->first();
+
+        if ($stream->get('tags') && array_key_exists('rotate', $stream->get('tags')) && $stream->get('tags')['rotate'] == 90) {
+            $this->height = $stream->getDimensions()->getWidth();
+            $this->width = $stream->getDimensions()->getHeight();
+        } else {
+            $this->height = $stream->getDimensions()->getHeight();
+            $this->width = $stream->getDimensions()->getWidth();
+        }
+
+        $this->ratio = floor($stream->getDimensions()
+            ->getRatio(true)
+            ->getValue() * 100) / 100;
+        $this->duration = $media->getDurationInSeconds();
+
+        return $this;
     }
 
     /**

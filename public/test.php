@@ -26,13 +26,21 @@ $app->make(Kernel::class)->bootstrap();
 $container = Container::getInstance();
 DB::enableQueryLog();
 
-$project = Projects::query()->find(3);
+// $project = Projects::query()->find(3);
 // $project->progress ++;
 // $project->status = 3;
 // $project->save();
 /* @var $broad_result PendingBroadcast */
-$broad_result  = broadcast(new ProjectUpdate($project));
-$result = $broad_result->__destruct();
+// $broad_result  = broadcast(new ProjectUpdate($project));
+// $result = $broad_result->__destruct();
+
+/* @var $media Video */
+/* @var $media_model MediaFiles */
+$media_model = MediaFiles::query()->find(91);
+$media = $media_model->getMedia();
+$result = $media->getStreams()->videos()->first()->all();
+$media_model->refreshMediaData()->save();
+
 
 $log = DB::getQueryLog();
 
