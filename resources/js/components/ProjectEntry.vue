@@ -10,7 +10,13 @@
                         controls>
                 <source :src="'/storage/media/' + project.output.id" :type="projectEntry.mime_type" />
             </video>
-            <b-card-img v-else v-on:click="selectProject()" :src="'/storage/thumbs/' + project.output.id" class="rounded-0"></b-card-img>
+            <b-card-img 
+            	v-else 
+            	v-on:click="selectProject()" 
+            	:src="'/storage/thumbs/' + project.output.id"
+            	:class="[projectEntry.status == 1 ? 'clickable' : '']" 
+            	class="rounded-0">
+            </b-card-img>
             <b-card-body>
                 <b-card-text>
                     <p>{{ project.output.label ? project.output.label : project.output.name }}</p>
@@ -80,7 +86,9 @@ export default {
 	
 	methods: {
 		selectProject: function() {
-			this.$emit('select-project');
+			if (this.projectEntry.status == 1) {
+				this.$emit('select-project');
+			}
 		},
 		refreshProjectData: function() {
 			self = this;
@@ -153,7 +161,4 @@ export default {
 	border-radius: 0;
 }
 
-img {
-	cursor: pointer;
-}
 </style>

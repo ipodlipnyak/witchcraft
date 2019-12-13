@@ -13508,3 +13508,7 @@ body {
   border-radius: 0;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
