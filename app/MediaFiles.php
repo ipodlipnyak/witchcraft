@@ -207,8 +207,14 @@ class MediaFiles extends Model
     {
         // Deleting thumbnail
         $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
-        if ($this->thumbnail && Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) {
-            Storage::disk($this->storage_disk)->delete("{$thumbnails_storage}/{$this->thumbnail}");
+        $thumbnail_prop_list = [
+            'thumbnail',
+            'thumbnail_original_ratio'
+        ];
+        foreach ($thumbnail_prop_list as $thumbnail_prop) {
+            if ($this->$thumbnail_prop && Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->$thumbnail_prop}")) {
+                Storage::disk($this->storage_disk)->delete("{$thumbnails_storage}/{$this->$thumbnail_prop}");
+            }
         }
 
         // Deleting media file
@@ -241,9 +247,17 @@ class MediaFiles extends Model
     /**
      * Return full path for thumbnail
      *
+     * @param string $ratio
+     *            <p>Acceptable values:</p>
+     *            <ul>
+     *            <li>original - return thumb with original aspect ratio</li>
+     *            <li>square - return thumb with square aspect ratio</li>
+     *            </ul>
+     *            
+     *            <p>With wrong value it alwayse square ratio</p>
      * @return string
      */
-    public function getThumbnail(): string
+    public function getThumbnail(string $ratio = 'square'): string
     {
         $thumbnails_storage = env('FFMPEG_THUMBNAILS_FOLDER');
         $result = '';
@@ -259,8 +273,23 @@ class MediaFiles extends Model
             $thumb_source = $this;
         }
 
+        $original_ratio = $ratio == "original";
+
+        switch ($ratio) {
+            case 'original':
+                $thumbnail_prop = "thumbnail_original_ratio";
+                break;
+
+            case 'square':
+            default:
+                $thumbnail_prop = "thumbnail";
+                break;
+        }
+
+        $thumbnail_prop = $original_ratio ? 'thumbnail_original_ratio' : 'thumbnail';
+
         // if there is no thumbnail we will try to create new
-        if ((! $this->thumbnail || ! Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) && $thumb_source && $thumb_source->getMedia()) {
+        if ((! $this->$thumbnail_prop || ! Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->$thumbnail_prop}")) && $thumb_source && $thumb_source->getMedia()) {
             $thumb_name = Str::random() . ".png";
 
             // save first frame from media-file to thumbnails storage
@@ -280,8 +309,28 @@ class MediaFiles extends Model
                 $width,
                 $max_scale
             ]);
-            // thumb should not been scaled smaller then 400 px
-            $filter = $max_scale == $scale_size ? "scale=$scale_size:-1, crop=$scale_size:$scale_size" : "crop=$scale_size:$scale_size";
+
+            // thumb should not been scaled smaller then $max_scale (400 px)
+            $filter_scale = $max_scale == $scale_size ? "scale=$scale_size:-1" : "";
+
+            switch ($ratio) {
+                case 'original':
+                    $filters_list = [
+                        $filter_scale
+                    ];
+                    break;
+
+                case 'square':
+                default:
+                    $filter_crop = "crop=$scale_size:$scale_size";
+                    $filters_list = [
+                        $filter_scale,
+                        $filter_crop
+                    ];
+                    break;
+            }
+
+            $filter = implode(", ", $filters_list);
 
             if ($filter) {
                 $frame->addFilter(function (FrameFilters $filters) use ($filter) {
@@ -293,13 +342,13 @@ class MediaFiles extends Model
                 ->toDisk($this->storage_disk)
                 ->save("{$thumbnails_storage}/{$thumb_name}");
 
-            $this->thumbnail = $thumb_name;
+            $this->$thumbnail_prop = $thumb_name;
             $this->save();
         }
 
         $storage_disk = Storage::disk($this->storage_disk)->getAdapter()->getPathPrefix();
-        if ($this->thumbnail && Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->thumbnail}")) {
-            $result = "{$storage_disk}{$thumbnails_storage}/{$this->thumbnail}";
+        if ($this->$thumbnail_prop && Storage::disk($this->storage_disk)->exists("{$thumbnails_storage}/{$this->$thumbnail_prop}")) {
+            $result = "{$storage_disk}{$thumbnails_storage}/{$this->$thumbnail_prop}";
         } else {
             $placeholder = env('IMG_PLACEHOLDER', 'placeholder.svg');
             $result = "{$storage_disk}{$placeholder}";
@@ -311,11 +360,15 @@ class MediaFiles extends Model
     /**
      * Get thumbnail url
      *
+     * @param bool $original_ratio
+     *            if true return thumb with original aspect ratio
      * @return string
      */
-    public function getThumbnailUrl(): string
+    public function getThumbnailUrl(bool $original_ratio = false): string
     {
-        return $this->thumbnail ? "/thumbs/{$this->id}" : "";
+        $thumbnail_prop = $original_ratio ? 'thumbnail_original_ratio' : 'thumbnail';
+        $ratio = $original_ratio ? "/original" : "";
+        return $this->$thumbnail_prop ? "/thumbs/{$this->id}{$ratio}" : "";
     }
 
     /**

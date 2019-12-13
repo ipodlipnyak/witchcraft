@@ -5,6 +5,7 @@
             <video
                         v-if="projectEntry.status == 4"
                         preload="auto" 
+                        :poster="'/storage/thumbs/' + project.output.id + '/original'"
                         :id="'player-' + project.id" 
                         width="100%" 
                         controls>
@@ -13,7 +14,7 @@
             <b-card-img 
             	v-else 
             	v-on:click="selectProject()" 
-            	:src="'/storage/thumbs/' + project.output.id"
+            	:src="'/storage/thumbs/' + project.output.id + '/original'"
             	:class="[projectEntry.status == 1 ? 'clickable' : '']" 
             	class="rounded-0">
             </b-card-img>

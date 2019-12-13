@@ -20,6 +20,7 @@ class CreateMediaFilesTable extends Migration
             $table->string('storage_disk')->nullable();
             $table->string('storage_path')->nullable();
             $table->string('thumbnail')->nullable();
+            $table->string('thumbnail_original_ratio')->nullable();
             $table->string('label')->nullable();
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();

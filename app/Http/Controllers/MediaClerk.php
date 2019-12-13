@@ -40,8 +40,11 @@ class MediaClerk extends Controller
     {
         /* @var $media_model MediaFiles */
         $media_model = MediaFiles::query()->find(request('mediaId'));
-        if ($media_model && $media_model->user == Auth::user()->id && $media_model->getThumbnail()) {
-            return response()->file($media_model->getThumbnail());
+
+        $ratio = request('ratio') ?: 'square';
+
+        if ($media_model && $media_model->user == Auth::user()->id && $media_model->getThumbnail($ratio)) {
+            return response()->file($media_model->getThumbnail($ratio));
         } else {
             return abort(404);
         }

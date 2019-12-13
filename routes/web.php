@@ -13,7 +13,7 @@
 Route::get('/', 'MediaClerk@index');
 
 Route::prefix('storage')->group(function () {
-    Route::get('/thumbs/{mediaId}', 'MediaClerk@getThumb');
+    Route::get('/thumbs/{mediaId}/{ratio?}', 'MediaClerk@getThumb');
     Route::get('/media/{mediaId}', 'MediaClerk@getMedia');
 });
 
