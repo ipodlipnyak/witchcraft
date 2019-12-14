@@ -233,11 +233,13 @@ class MediaFiles extends Model
     /**
      * Check if ratio same as for compared model
      *
+     * @param bool $force_same_scale
+     *            if true check for exact match of height and width params
      * @param int|MediaFiles $compare_to
      *            id or model of a media file to compare
      * @return bool
      */
-    public function checkIfSameRatio($compare_to): bool
+    public function checkIfSameRatio($compare_to, bool $force_same_scale = false): bool
     {
         /* @var $compare_to_model MediaFiles */
         if (gettype($compare_to) == 'integer') {
@@ -253,16 +255,22 @@ class MediaFiles extends Model
             ->first();
 
         if ($this->getVideoRotateDegree() == 90) {
+            $match_width = $this_video->getDimensions()->getHeight();
             $calculated_height = $this_video->getDimensions()
                 ->getRatio()
                 ->calculateWidth($compare_to_model->width);
         } else {
+            $match_width = $this_video->getDimensions()->getWidth();
             $calculated_height = $this_video->getDimensions()
                 ->getRatio()
                 ->calculateHeight($compare_to_model->width);
         }
 
         if ($calculated_height != $compare_to_model->height) {
+            return false;
+        }
+        
+        if ($force_same_scale && $match_width != $compare_to_model->width) {
             return false;
         }
 

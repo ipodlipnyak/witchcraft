@@ -71,10 +71,18 @@ class Projects extends Model
             $media_model = $input_model->media_file()->first();
 
             if (! $media_model->checkIfSameRatio($output_model)) {
+                // when trying to convert we should use input of the same ratio as output model
+                $input_model->status = InputStatuses::WRONG_RATIO;
+                $input_model->save();
+                $brocken_count ++;
+            } elseif (count($input_list) > 1 && ! $media_model->checkIfSameRatio($first_media_model, true)) {
+                // when trying to concatenate we should use inputs of the same ratio and scale
+                /* @TODO should remove this check when automated multitask would be complete */
                 $input_model->status = InputStatuses::WRONG_RATIO;
                 $input_model->save();
                 $brocken_count ++;
             } elseif (count($input_list) > 1 && ! $media_model->checkIfSameCodec($first_media_model)) {
+                // when trying to concatenate we should use inputs of the same codecs
                 $input_model->status = InputStatuses::WRONG_CODEC;
                 $input_model->save();
                 $brocken_count ++;
