@@ -4,7 +4,7 @@
         <b-card no-body class="overflow-hidden mb-2">
             <video
                         v-if="projectEntry.status == 4"
-                        preload="auto" 
+                        preload="none" 
                         :poster="'/storage/thumbs/' + project.output.id + '/original'"
                         :id="'player-' + project.id" 
                         width="100%" 
