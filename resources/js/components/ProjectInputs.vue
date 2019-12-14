@@ -29,11 +29,11 @@
           					style="max-height: 3rem;"
           					
           					<b-row no-gutters>
-          						<b-col md="4">
+          						<b-col md="12" lg="4">
         							<b-card-img :src="'/storage/thumbs/' + file.id" class="rounded-0"></b-card-img>
       							</b-col>
       							
-      							<b-col md="8">
+      							<b-col md="12" lg="8">
       							<b-card-body :title="file.label ? file.label : file.name">
       							
       								<b-card-text>
@@ -78,11 +78,11 @@
           					style="max-height: 3rem;"
           					
           					<b-row no-gutters>
-          						<b-col md="4">
+          						<b-col md="12" lg="4">
         							<b-card-img :src="'/storage/thumbs/' + file.id" class="rounded-0"></b-card-img>
       							</b-col>
       							
-      							<b-col md="8">
+      							<b-col md="12" lg="8">
       							<b-card-body class="overflow-hidden mr-1" :title="file.label ? file.label : file.name">
       							
       								<b-card-text>
@@ -284,6 +284,11 @@ export default {
 	border-radius: 0;
 	border: none;
 }
+
+.card-body {
+	padding: 1rem;
+}
+
 
 .bar {
 	height: 60vh;
