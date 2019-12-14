@@ -320,8 +320,15 @@ export default {
     	},
     	
     	selectPreset: function(set) {
-    		this.aspectHeight = set.h;
-    		this.aspectWidth = set.w;
+    		let inputs_list = this.$refs.inputs.inputs;
+    		// check if first input in portrait mode
+    		if (inputs_list.length > 0 && inputs_list[0].height > inputs_list[0].width) {
+    			this.aspectHeight = set.w;
+        		this.aspectWidth = set.h;
+    		} else {
+    			this.aspectHeight = set.h;
+        		this.aspectWidth = set.w;
+    		}
     	},
 	},
 }
