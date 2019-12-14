@@ -123,7 +123,8 @@ class ProjectsController extends Controller
         array_push($files_to_skip, $project['output']);
         $files = MediaFiles::query()->where('user', Auth::user()->id)
             ->whereKeyNot($files_to_skip)
-            ->where('start_offset', null)
+            ->whereNull('start_offset')
+            ->whereNotNull('duration')
             ->get();
 
         if ($files) {
@@ -146,7 +147,8 @@ class ProjectsController extends Controller
         ];
 
         $files = MediaFiles::query()->where('user', Auth::user()->id)
-            ->where('start_offset', null)
+            ->whereNull('start_offset')
+            ->whereNotNull('duration')
             ->get();
 
         if ($files) {

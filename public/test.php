@@ -36,10 +36,15 @@ DB::enableQueryLog();
 
 /* @var $media Video */
 /* @var $media_model MediaFiles */
-$media_model = MediaFiles::query()->find(91);
-$media = $media_model->getMedia();
-$result = $media->getStreams()->videos()->first()->all();
-$media_model->refreshMediaData()->save();
+// $media_model = MediaFiles::query()->find(91);
+// $media = $media_model->getMedia();
+// $result = $media->getStreams()->videos()->first()->all();
+// $media_model->refreshMediaData()->save();
+
+$result = MediaFiles::query()
+->whereNull('start_offset')
+->whereNotNull('duration')
+->get();
 
 
 $log = DB::getQueryLog();
