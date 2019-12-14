@@ -13,8 +13,8 @@
             	<div class="slider__list" ref="list"  v-pan="onPan">
                 	<div v-for="(slide, index) in slides" :key="slide.label" class="slider__item flex-column">
                     	<component 
-                    		v-on:lock-swipe="unlockSwipe = false" 
-                    		v-on:unlock-swipe="unlockSwipe = true" 
+                    		v-on:lock-swipe="setSwipeLock(true)" 
+                    		v-on:unlock-swipe="setSwipeLock(false)" 
                     		v-if="slide == activeSlide" 
                     		:ref="slide.label" 
                     		:api-token="apiToken" 
@@ -43,7 +43,7 @@ export default {
 		props: ['apiToken'],
 	  	data: function () {
 		    return {
-		    	unlockSwipe: true,
+		    	unlockSwipe: false, // @TODO swipe locked until treshhold limiter would complete
 		    	slides: [
 		    		{
 		    			label: 'uploader',
@@ -115,11 +115,15 @@ export default {
 			
 			activeSlide: function(newVal, oldVal) {
 				// if we had changed slide we should be able to swipe them
-				this.unlockSwipe = true;
+				this.setSwipeLock(false);
 			},
 		},
         
         methods: {
+        	setSwipeLock(lock = false) {
+        		// @TODO swipe locked until treshhold limiter would complete
+ 				//this.unlockSwipe = lock ? false : true;
+        	},
         	onPan: function(e) {
         		if (this.unlockSwipe) {
         		  // how far the slider has been dragged in percentage of the visible container
