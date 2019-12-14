@@ -43,9 +43,7 @@ class Projects extends Model
 
         $input_list = ProjectInputs::query()->where('project', $this->id)->get();
         if (count($input_list) > 1) {
-            return $input_list->where('status', InputStatuses::WRONG_CODEC)
-                ->get()
-                ->isNotEmpty();
+            return $input_list->where('status', InputStatuses::WRONG_CODEC)->isNotEmpty();
         } else {
             return false;
         }
@@ -72,11 +70,11 @@ class Projects extends Model
             /* @var $media_model MediaFiles */
             $media_model = $input_model->media_file()->first();
 
-            if ($media_model->checkIfSameRatio($output_model)) {
+            if (! $media_model->checkIfSameRatio($output_model)) {
                 $input_model->status = InputStatuses::WRONG_RATIO;
                 $input_model->save();
                 $brocken_count ++;
-            } elseif (count($input_list) > 1 && $media_model->checkIfSameCodec($first_media_model)) {
+            } elseif (count($input_list) > 1 && ! $media_model->checkIfSameCodec($first_media_model)) {
                 $input_model->status = InputStatuses::WRONG_CODEC;
                 $input_model->save();
                 $brocken_count ++;

@@ -35,6 +35,11 @@ class CreateInputStatusesTable extends Migration
                 'id' => 3,
                 'name' => 'WRONG RATIO',
                 'desc' => 'Input ratio is incompatible with current project'
+            ],
+            [
+                'id' => 4,
+                'name' => 'WRONG CODEC',
+                'desc' => 'Input codec is different from first input of the project'
             ]
         ]);
     }

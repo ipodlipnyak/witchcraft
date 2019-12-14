@@ -106,7 +106,7 @@ class MediaFiles extends Model
             ->videos()
             ->first();
 
-        if ($stream->get('tags') && array_key_exists('rotate', $stream->get('tags')) && $stream->get('tags')['rotate'] == 90) {
+        if ($this->getVideoRotateDegree() == 90) {
             $this->height = $stream->getDimensions()->getWidth();
             $this->width = $stream->getDimensions()->getHeight();
         } else {
@@ -120,6 +120,26 @@ class MediaFiles extends Model
         $this->duration = $media->getDurationInSeconds();
 
         return $this;
+    }
+
+    /**
+     * Find out if video had a rotate tag and return its value
+     *
+     * @return number
+     */
+    public function getVideoRotateDegree()
+    {
+        /* @var $media Video */
+        $media = $this->getMedia();
+        $stream = $media->getStreams()
+            ->videos()
+            ->first();
+
+        if ($stream->get('tags') && array_key_exists('rotate', $stream->get('tags'))) {
+            return (int) $stream->get('tags')['rotate'];
+        }
+
+        return 0;
     }
 
     /**
@@ -232,9 +252,17 @@ class MediaFiles extends Model
             ->videos()
             ->first();
 
-        if ($this_video->getDimensions()
-            ->getRatio()
-            ->calculateHeight($compare_to_model->width) != $compare_to_model->height) {
+        if ($this->getVideoRotateDegree() == 90) {
+            $calculated_height = $this_video->getDimensions()
+                ->getRatio()
+                ->calculateWidth($compare_to_model->width);
+        } else {
+            $calculated_height = $this_video->getDimensions()
+                ->getRatio()
+                ->calculateHeight($compare_to_model->width);
+        }
+
+        if ($calculated_height != $compare_to_model->height) {
             return false;
         }
 

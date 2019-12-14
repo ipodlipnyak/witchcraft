@@ -31,7 +31,7 @@ DB::enableQueryLog();
 // $project->status = 3;
 // $project->save();
 /* @var $broad_result PendingBroadcast */
-// $broad_result  = broadcast(new ProjectUpdate($project));
+// $broad_result = broadcast(new ProjectUpdate($project));
 // $result = $broad_result->__destruct();
 
 /* @var $media Video */
@@ -41,11 +41,7 @@ DB::enableQueryLog();
 // $result = $media->getStreams()->videos()->first()->all();
 // $media_model->refreshMediaData()->save();
 
-$result = MediaFiles::query()
-->whereNull('start_offset')
-->whereNotNull('duration')
-->get();
-
+$result = MediaFiles::query()->where('upload_session', '<>', 2)->get();
 
 $log = DB::getQueryLog();
 

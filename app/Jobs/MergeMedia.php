@@ -20,6 +20,8 @@ use App\ProjectInputs;
 use FFMpeg\Media\Video;
 use FFMpeg\Media\AbstractStreamableMedia;
 use App\Events\ProjectUpdate;
+use Illuminate\Support\Facades\Log;
+use FFMpeg\Exception\RuntimeException;
 
 class MergeMedia implements ShouldQueue
 {
@@ -91,14 +93,25 @@ class MergeMedia implements ShouldQueue
         /* @var $input_model MediaFiles */
         if ($inputs_list->count() == 1) {
             $input_model = $inputs_list->first();
-            $this->convertMedia($input_model, $task);
+            try {
+                $this->convertMedia($input_model, $task);
+            } catch (RuntimeException $e) {
+                Log::info($e->getMessage());
+                return false;
+            }
         } elseif ($inputs_list->count() > 1) {
             /*
              * @TODO work in progress:
              * + check if convertMedia and concatenate methods are working properly
              * - maybe maybe should generate new tasks to convert every input to same codec before concatenate them
              */
-            $this->concatenate($inputs_list, $task);
+            try {
+                $this->concatenate($inputs_list, $task);
+            } catch (RuntimeException $e) {
+                Log::info($e->getMessage());
+                return false;
+            }
+
             // foreach ($task->inputs()->get() as $input_model) {
             // $input_model->getFullPath();
             // $input_media = $input_model->getMedia();

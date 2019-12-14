@@ -15,7 +15,7 @@
             	v-else 
             	v-on:click="selectProject()" 
             	:src="'/storage/thumbs/' + project.output.id + '/original'"
-            	:class="[projectEntry.status == 1 ? 'clickable' : '']" 
+            	:class="[selectable ? 'clickable' : '']" 
             	class="rounded-0">
             </b-card-img>
             <b-card-body>
@@ -34,6 +34,18 @@
             	variant="success">
             	Download
             </b-button>
+            <b-button v-if="projectEntry.status == 5" block squared @click="selectProject()" variant="danger">Encoding failed</b-button>
+		
+		<!-- 
+            <b-alert v-if="projectEntry.status == 5" show variant="danger">
+            <p>Encoding failed</p>
+            <hr> 
+            <small>Edit project,</small>
+            <small>fix possible unconsistency in inputs</small>
+            <small>and try start it again</small>
+            </b-alert>
+		-->
+            
         </b-card>
 
     </div>
@@ -41,7 +53,7 @@
 
 
 <script>
-import { CardPlugin, ButtonPlugin, ProgressPlugin } from 'bootstrap-vue';
+import {CardPlugin, ButtonPlugin, ProgressPlugin } from 'bootstrap-vue';
 
 Vue.use(ProgressPlugin)
 Vue.use(CardPlugin)
@@ -62,6 +74,14 @@ export default {
 	},
 	
 	computed: {
+		selectable() {
+			if (this.projectEntry && this.projectEntry.status) {
+				return  [1, 5].includes(this.projectEntry.status);
+			}
+			
+			return false;
+			
+		},
 		download_name() {
 			return this.projectEntry.output.label + '.' + this.projectEntry.file_extension
 		},
@@ -87,7 +107,7 @@ export default {
 	
 	methods: {
 		selectProject: function() {
-			if (this.projectEntry.status == 1) {
+			if (this.selectable) {
 				this.$emit('select-project');
 			}
 		},
