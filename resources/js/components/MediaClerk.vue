@@ -10,7 +10,7 @@
         </b-navbar>
         <main class="d-flex">
         	<section class="slider">
-            	<div class="slider__list" ref="list"  v-pan="onPan">
+            	<div class="slider__list" ref="list"  v-swipe="onPan">
                 	<div v-for="(slide, index) in slides" :key="slide.label" class="slider__item flex-column">
                     	<component 
                     		v-on:lock-swipe="setSwipeLock(true)" 
@@ -43,7 +43,7 @@ export default {
 		props: ['apiToken'],
 	  	data: function () {
 		    return {
-		    	unlockSwipe: false, // @TODO swipe locked until treshhold limiter would complete
+		    	unlockSwipe: true, // @TODO swipe locked until treshhold limiter would complete
 		    	slides: [
 		    		{
 		    			label: 'uploader',
@@ -122,7 +122,7 @@ export default {
         methods: {
         	setSwipeLock(lock = false) {
         		// @TODO swipe locked until treshhold limiter would complete
- 				//this.unlockSwipe = lock ? false : true;
+ 				this.unlockSwipe = lock ? false : true;
         	},
         	onPan: function(e) {
         		if (this.unlockSwipe) {

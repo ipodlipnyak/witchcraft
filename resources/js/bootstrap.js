@@ -25,6 +25,9 @@ window.Hammer = require('hammerjs');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+import gsap from "gsap";
+window.gsap = gsap;
+
 import Echo from "laravel-echo"; 
 window.io = require('socket.io-client');
 //Have this in case you stop running your laravel echo server

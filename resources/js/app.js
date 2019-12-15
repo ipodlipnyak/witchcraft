@@ -46,6 +46,34 @@ Vue.directive("tap", {
 	}
 });
 
+Vue.directive("press", {
+	bind: function(el, binding) {
+		if (typeof binding.value === "function") {
+			const mc = new Hammer(el);
+			mc.on("press", binding.value);
+		}
+	}
+});
+
+Vue.directive("pressup", {
+	bind: function(el, binding) {
+		if (typeof binding.value === "function") {
+			const mc = new Hammer(el);
+			mc.on("pressup", binding.value);
+		}
+	}
+});
+
+
+Vue.directive("swipe", {
+	bind: function(el, binding) {
+		if (typeof binding.value === "function") {
+			const mc = new Hammer(el);
+			mc.on("swipe", binding.value);
+		}
+	}
+});
+
 const app = new Vue({
     el: '#app',
 });

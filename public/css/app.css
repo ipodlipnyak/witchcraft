@@ -13512,3 +13512,7 @@ body {
   cursor: pointer;
 }
 
+.btn.btn-info {
+  color: white;
+}
+

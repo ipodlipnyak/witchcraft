@@ -72,7 +72,8 @@
   		cols="2"
   		gutter="10">
   		<project-entry 
-  			v-for="(project, index) in projects" 
+  			ref="entries"
+  			v-for="project in projects" 
   			v-on:select-project="selectProject(project.id)" 
   			:project="project" 
   			:key="project.id"

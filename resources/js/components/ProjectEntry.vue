@@ -2,6 +2,7 @@
     <div class="project-entry">
     
         <b-card no-body class="overflow-hidden mb-2">
+        	<fill-up-button ref="deleteButton" v-on:do-it="deleteProject">Hold to delete</fill-up-button>
             <video
                         v-if="projectEntry.status == 4"
                         preload="none" 
@@ -53,6 +54,7 @@
 
 
 <script>
+import FillUpButton from './FillUpButton'
 import {CardPlugin, ButtonPlugin, ProgressPlugin } from 'bootstrap-vue';
 
 Vue.use(ProgressPlugin)
@@ -63,7 +65,7 @@ export default {
 	props: ['project', 'apiToken'],
 	
 	components: {
-		//
+		FillUpButton
 	},
 	
 	data: function () {
@@ -106,6 +108,9 @@ export default {
 	},
 	
 	methods: {
+		deleteProject: function() {
+			console.log('do it');
+		},
 		selectProject: function() {
 			if (this.selectable) {
 				this.$emit('select-project');
@@ -165,6 +170,7 @@ export default {
 
 <style lang='scss' scoped>
 .project-entry {
+/* 	transform: translateX(calc(var(--x, 0) * 1%)); */
 /* 	height: 50px; */
 }
 .project-img {
