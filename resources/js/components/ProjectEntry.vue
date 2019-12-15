@@ -110,6 +110,17 @@ export default {
 	methods: {
 		deleteProject: function() {
 			console.log('do it');
+			self = this;
+			
+    		axios.delete('/api/projects/' + self.project.id + '?api_token=' + self.apiToken)
+    		.then(function (response) {
+    			if (response.data.status == 'success') {
+    				self.$emit('refresh-projects-listing');
+    			}
+    		})
+    		.catch(function (error) {
+    			console.log(error);
+    		});
 		},
 		selectProject: function() {
 			if (this.selectable) {
@@ -158,10 +169,6 @@ export default {
     		.catch(function (error) {
     			console.log(error);
     		});
-		},
-		
-		downloadProject: function() {
-			//
 		},
 	},
 }

@@ -74,7 +74,8 @@
   		<project-entry 
   			ref="entries"
   			v-for="project in projects" 
-  			v-on:select-project="selectProject(project.id)" 
+  			v-on:select-project="selectProject(project.id)"
+  			v-on:refresh-projects-listing="getProjects"
   			:project="project" 
   			:key="project.id"
   			:api-token="apiToken">

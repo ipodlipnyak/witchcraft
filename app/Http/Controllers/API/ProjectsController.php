@@ -335,6 +335,16 @@ class ProjectsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $result = [
+            'status' => 'error'
+        ];
+
+        /* @var $project Projects */
+        $project = Projects::query()->find(request('id'));
+        if ($project->delete()) {
+            $result['status'] = 'success';
+        }
+
+        return response()->json($result);
     }
 }
