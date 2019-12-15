@@ -79,9 +79,6 @@ export default {
 	text-align: center;
 	white-space: nowrap;
 	background-color: #e3342f;
-	/* 	transition: width .6s ease; */
-	display: flex;
-	margin-right: auto;
 	border-radius: 0;
 }
 </style>
