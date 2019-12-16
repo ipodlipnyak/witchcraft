@@ -109,7 +109,6 @@ export default {
 	
 	methods: {
 		deleteProject: function() {
-			console.log('do it');
 			self = this;
 			
     		axios.delete('/api/projects/' + self.project.id + '?api_token=' + self.apiToken)

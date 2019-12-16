@@ -10,9 +10,6 @@
 import gsap from "gsap";
 
 export default {
-		props: [
-			//'apiToken'
-			],
 	  	data: function () {
 	  		return {
 	  			tween: ''
@@ -20,12 +17,15 @@ export default {
 	  	},
 		
 		mounted() {
+	  		var self = this;
 			this.tween = gsap.to(this.$refs.filler, 1, {
     			width: "100%",
     			paused: true,
     			ease: "elastic",
 		        onComplete: () => {
 		        	this.holdMe();
+		        	self.tween.restart();
+		        	self.tween.pause();
 		        }
 			});
 		},
@@ -49,6 +49,7 @@ export default {
 
 <style lang='scss' scoped>
 .fu-butt {
+/* 	cursor: pointer; */
 	position:relative;
 	display: flex;
 	height: 2.5rem;

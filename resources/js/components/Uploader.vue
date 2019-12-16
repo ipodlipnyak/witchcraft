@@ -1,11 +1,60 @@
 <template>
 <div class="container"><div class="row justify-content-center"><div class="col-md-8">
-            
-  <b-button v-if="filesUploaded.length > 0" block squared v-b-toggle.uploaded-files variant="primary">Uploaded files</b-button>
-  <b-collapse v-if="filesUploaded.length > 0" id="uploaded-files" class="mt-2">
 
-  <b-table striped hover 
-  		:items="filesUploaded" 
+	<b-button-group size="bg" class="btn-block">
+  		<file-upload
+    		ref="upload"
+    		v-model="files"
+    		:post-action="uploadAction"
+    		@input-file="inputFile"
+    		@input-filter="inputFilter"
+    		chunk-enabled
+    		:chunk="chunk"
+    		:multiple="true"
+    		class="btn btn-primary btn-square">
+  		
+  			<font-awesome-icon icon="plus" :style="{ color: 'white' }"/>
+  			Upload file
+		</file-upload>
+    
+		<b-button 
+			squared 
+			v-if="files.length > 0" 
+			v-show="!$refs.upload || !$refs.upload.active" 
+			@click.prevent="$refs.upload.active = true" 
+			variant="success">
+			Start upload
+		</b-button>
+		
+		<b-button 
+			squared 
+			v-if="files.length > 0" 
+			v-show="$refs.upload && $refs.upload.active" 
+			@click.prevent="$refs.upload.active = false" 
+			variant="danger">
+			Stop upload
+		</b-button>
+	</b-button-group>
+	
+	<b-table id="files-to-upload" v-if="files.length > 0" class="upload-tbl" :items="files" :fields="fields_files">
+		<template v-slot:cell(size)="data">
+			{{ formatBytes(data.value) }}
+		</template>
+  
+		<template v-slot:cell(progress)="data">
+			<p v-if="data.item.success"><font-awesome-icon icon="check-circle" :style="{ color: '#c7e0af' }" size="2x"/></p>
+			<button v-else-if="data.item.progress == '0.00'" @click="removeFileFromUploadQuery(data.item)">
+			<font-awesome-icon icon="times-circle" :style="{ color: '#e2ae85' }" size="2x"/>
+			</button>
+			<b-progress v-else :value="Number(data.value)" show-progress animated></b-progress>
+		</template>
+	</b-table>
+
+	<b-table
+		v-if="filesUploaded.length > 0" 
+		id="uploaded-files" 
+		class='files-tbl'
+		:items="filesUploaded" 
   		:fields="fields_uploaded"
 		:sort-by.sync="uploaded_sortBy"
       	:sort-desc.sync="uploaded_sortDesc">
@@ -23,59 +72,12 @@
 		</template>
 		
 		<template v-slot:cell(delete)="data">
-			<b-button @click="deleteFile(data.item.id)" block variant="danger">
-			<font-awesome-icon icon="times" :style="{ color: 'white' }" size="sm"/>
+			<fill-up-button ref="deleteButton" v-on:do-it="deleteFile(data.item.id)">
+			<font-awesome-icon icon="times-circle" :style="{ color: '#e2ae85' }" size="2x"/>
+			</fill-up-button>
 			</b-button>
 		</template>
-  </b-table>
-
-  </b-collapse>
-
-<!-- 
-<hr v-if="filesUploaded.length > 0"/>
- -->
-
-  <b-table id="files-to-upload" v-if="files.length > 0" striped hover :items="files" :fields="fields_files">
-		<template v-slot:cell(size)="data">
-			{{ formatBytes(data.value) }}
-		</template>
-  
-		<template v-slot:cell(progress)="data">
-			<font-awesome-icon v-if="data.item.success" icon="check" :style="{ color: 'green' }" size="lg"/>
-			<b-button v-else-if="data.item.progress == '0.00'" @click="removeFileFromUploadQuery(data.item)" block variant="danger">
-			<font-awesome-icon icon="times" :style="{ color: 'white' }" size="sm"/>
-			</b-button>
-			<b-progress v-else :value="Number(data.value)" show-progress animated></b-progress>
-		</template>
-  </b-table>
-
-    <b-button-group size="bg" class="btn-block">
-    
-  <file-upload
-    ref="upload"
-    v-model="files"
-    :post-action="uploadAction"
-    @input-file="inputFile"
-    @input-filter="inputFilter"
-    
-    chunk-enabled
-    :chunk="chunk"
-    
-    :multiple="true"
-    
-    
-    class="btn btn-primary btn-square"
-
-  >
-  <font-awesome-icon icon="plus" :style="{ color: 'white' }"/>
-  Upload file
-  </file-upload>
-    
-      <b-button squared v-if="files.length > 0" v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" variant="success">Start upload</b-button>
-      <b-button squared v-if="files.length > 0" v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" variant="danger">Stop upload</b-button>
-    </b-button-group>
-
-            
+	</b-table>
         
 </div></div></div>
 </template>
@@ -105,6 +107,8 @@ window.checkOverflow = function (el)
 
 	   return isOverflowing;
 	}
+
+import FillUpButton from './FillUpButton';
 
 import FileUpload from 'vue-upload-component';
 import { ImagePlugin, TablePlugin, ProgressPlugin, CollapsePlugin, ButtonPlugin, ButtonGroupPlugin } from 'bootstrap-vue';
@@ -141,7 +145,8 @@ Vue.use(ButtonGroupPlugin)
 		    	  'name',
 // 		    	  'type',
 		    	  'size',
-		    	  'progress'],
+		    	  'progress'
+		    	  ],
 		      
 		      filesUploaded: [],
 		      fields_uploaded: [
@@ -186,6 +191,7 @@ Vue.use(ButtonGroupPlugin)
 		components: {
 			FileUpload,
 			FontAwesomeIcon,
+			FillUpButton
 		},
 		
 		created() {
@@ -299,8 +305,6 @@ Vue.use(ButtonGroupPlugin)
 	}
 </script>
 
-<style scoped>
-#uploaded-files, #files-to-upload {
-	background: white;
-}
+<style scoped lang='scss'>
+
 </style>

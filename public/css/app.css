@@ -13474,6 +13474,166 @@ body {
   overflow: hidden;
 }
 
+@media (max-width: 991px) {
+  .files-tbl {
+    background: white;
+  }
+
+  .files-tbl tr:nth-of-type(2n+1) {
+    background-color: rgba(0, 0, 0, 0.035);
+  }
+
+  .files-tbl tr:hover {
+    /* 			color: #1c63aa; */
+    background-color: rgba(0, 0, 0, 0.045);
+  }
+
+  .files-tbl tr {
+    /*
+    	td {
+    		position:relative;
+    		* {
+    			position: absolute;
+    			left: 50%;
+    			top: 50%;
+    			transform: translate(-50%, -50%);
+    		}
+    	}
+    	*/
+  }
+
+  .files-tbl tr td:nth-child(1) {
+    padding: 0;
+    width: 77px;
+  }
+
+  .files-tbl tr td:nth-child(1) img {
+    height: 77px;
+  }
+
+  .files-tbl tr td:nth-child(4) {
+    padding: 0;
+    width: 25vw;
+  }
+
+  .files-tbl tr td:nth-child(4) .fu-butt {
+    background: none;
+    height: 77px;
+  }
+
+  .upload-tbl {
+    background: white;
+  }
+
+  .upload-tbl tr:nth-of-type(2n+1) {
+    background-color: rgba(0, 0, 0, 0.035);
+  }
+
+  .upload-tbl tr:hover {
+    background-color: rgba(0, 0, 0, 0.045);
+  }
+
+  .upload-tbl tr td:nth-child(3) {
+    padding: 0;
+    width: 25vw;
+    text-align: center;
+  }
+
+  .upload-tbl tr td:nth-child(3) * {
+    height: 77px;
+  }
+
+  .upload-tbl tr td:nth-child(3) button {
+    outline: none;
+    background: none;
+    border: none;
+  }
+
+  .upload-tbl tr td:nth-child(3) .progress {
+    border-radius: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .files-tbl {
+    background: white;
+  }
+
+  .files-tbl tr:nth-of-type(2n+1) {
+    background-color: rgba(0, 0, 0, 0.035);
+  }
+
+  .files-tbl tr:hover {
+    /* 			color: #1c63aa; */
+    background-color: rgba(0, 0, 0, 0.045);
+  }
+
+  .files-tbl tr {
+    /*
+    	td {
+    		position:relative;
+    		* {
+    			position: absolute;
+    			left: 50%;
+    			top: 50%;
+    			transform: translate(-50%, -50%);
+    		}
+    	}
+    	*/
+  }
+
+  .files-tbl tr td:nth-child(1) {
+    padding: 0;
+    width: 77px;
+  }
+
+  .files-tbl tr td:nth-child(1) img {
+    height: 77px;
+  }
+
+  .files-tbl tr td:nth-child(4) {
+    padding: 0;
+    width: 10vw;
+  }
+
+  .files-tbl tr td:nth-child(4) .fu-butt {
+    background: none;
+    height: 77px;
+  }
+
+  .upload-tbl {
+    background: white;
+  }
+
+  .upload-tbl tr:nth-of-type(2n+1) {
+    background-color: rgba(0, 0, 0, 0.035);
+  }
+
+  .upload-tbl tr:hover {
+    background-color: rgba(0, 0, 0, 0.045);
+  }
+
+  .upload-tbl tr td:nth-child(3) {
+    padding: 0;
+    width: 10vw;
+    text-align: center;
+  }
+
+  .upload-tbl tr td:nth-child(3) * {
+    height: 77px;
+  }
+
+  .upload-tbl tr td:nth-child(3) button {
+    outline: none;
+    background: none;
+    border: none;
+  }
+
+  .upload-tbl tr td:nth-child(3) .progress {
+    border-radius: 0;
+  }
+}
+
 .navbar {
   padding: 0;
 }
