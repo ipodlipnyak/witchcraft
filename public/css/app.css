@@ -13502,7 +13502,13 @@ body {
     	*/
   }
 
+  .files-tbl tr th:nth-child(-n+3),
+  .files-tbl tr td:nth-child(-n+3) {
+    text-align: center;
+  }
+
   .files-tbl tr td:nth-child(1) {
+    text-align: left;
     padding: 0;
     width: 77px;
   }
@@ -13533,10 +13539,14 @@ body {
     background-color: rgba(0, 0, 0, 0.045);
   }
 
+  .upload-tbl tr th,
+  .upload-tbl tr td {
+    text-align: center;
+  }
+
   .upload-tbl tr td:nth-child(3) {
     padding: 0;
     width: 25vw;
-    text-align: center;
   }
 
   .upload-tbl tr td:nth-child(3) * {
@@ -13582,7 +13592,13 @@ body {
     	*/
   }
 
+  .files-tbl tr th:nth-child(-n+3),
+  .files-tbl tr td:nth-child(-n+3) {
+    text-align: center;
+  }
+
   .files-tbl tr td:nth-child(1) {
+    text-align: left;
     padding: 0;
     width: 77px;
   }
@@ -13613,10 +13629,14 @@ body {
     background-color: rgba(0, 0, 0, 0.045);
   }
 
+  .upload-tbl tr th,
+  .upload-tbl tr td {
+    text-align: center;
+  }
+
   .upload-tbl tr td:nth-child(3) {
     padding: 0;
     width: 10vw;
-    text-align: center;
   }
 
   .upload-tbl tr td:nth-child(3) * {

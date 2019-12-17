@@ -32,7 +32,7 @@ export default {
 		        }
 			});
 		},
-	  	
+		
         methods: {
         	holdMe() {
         		this.$emit('do-it');
