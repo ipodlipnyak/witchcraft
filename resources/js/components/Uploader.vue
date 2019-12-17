@@ -65,9 +65,9 @@
 			</a>
 		</template>
 
-		<template v-slot:cell(upload_session.size)="data">
-			<p v-if="data.item.upload_session">
-				{{ formatBytes(data.item.upload_session.size) }}
+		<template v-slot:cell(size)="data">
+			<p v-if="data.item">
+				{{ formatBytes(data.item.size) }}
 			</p>
 		</template>
 		
@@ -152,8 +152,8 @@ Vue.use(ButtonGroupPlugin)
 		      fields_uploaded: [
 		    	  { key: 'thumb', label: '', sortable: false },
 		    	  { key: 'label', label: 'Name', sortable: true },
-// 		          { key: 'upload_session.mime_type', label: 'Type', sortable: true },
-		          { key: 'upload_session.size', label: 'Size', sortable: true },
+// 		          { key: 'mime_type', label: 'Type', sortable: true },
+		          { key: 'size', label: 'Size', sortable: true },
 		          { key: 'delete', label: '', sortable: false },
 		          ],
 		      uploaded_sortBy: 'label',

@@ -40,16 +40,25 @@ class MediaController extends Controller
             'status' => 'error'
         ];
 
-        $files = MediaFiles::query()->with('UploadSession')
+        $files_list = MediaFiles::query()
             ->where('user', Auth::user()->id)
-            ->where('start_offset', null)
-            ->where('storage_path', 'media')
+            ->whereIn('storage_path', [
+            'media',
+            'output'
+        ])
             ->where('storage_disk', 'files')
+            ->whereNull('start_offset')
+            ->whereNotNull('duration')
             ->get();
 
-        if ($files) {
+        /* @var $file_model MediaFiles */
+        foreach ($files_list as &$file_model) {
+            $file_model->size = $file_model->getSize();
+        }
+
+        if ($files_list) {
             $result['status'] = 'success';
-            $result['files'] = $files;
+            $result['files'] = $files_list;
         }
 
         return response()->json($result);
@@ -142,7 +151,9 @@ class MediaController extends Controller
                         /* @var $media Media */
                         $media = FFmpeg::fromDisk($this->disk)->open("{$this->media_storage}/{$file_name}");
                         /* @var $stream Stream */
-                        $stream = $media->getStreams()->videos()->first();
+                        $stream = $media->getStreams()
+                            ->videos()
+                            ->first();
 
                         $file_model = MediaFiles::createFromMedia($media);
                         $file_model->label = $upload_session->name;
@@ -235,7 +246,7 @@ class MediaController extends Controller
         ];
 
         $file_model = MediaFiles::query()->find(request('id'));
-        
+
         if ($file_model->delete()) {
             $result['status'] = 'success';
         }
