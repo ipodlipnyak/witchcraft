@@ -77,6 +77,10 @@
 			</fill-up-button>
 			</b-button>
 		</template>
+		
+		<template v-slot:head(size)="data">
+			Size {{ formatBytes(totalFilesSize) }}
+		</template>
 	</b-table>
         
 </div></div></div>
@@ -163,6 +167,16 @@ Vue.use(ButtonGroupPlugin)
 		computed: {
 			uploadAction: function () {
 				return '/api/files/upload?api_token=' + this.apiToken;
+			},
+			
+			totalFilesSize: function() {
+				let result = true;
+				
+				this.filesUploaded.forEach(function(file){
+					result += file.size;
+				});
+				
+				return result;
 			},
 			
 			chunk: function () {
