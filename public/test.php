@@ -42,7 +42,7 @@ DB::enableQueryLog();
 
 // $result = MediaFiles::query()->where('upload_session', '<>', 2)->get();
 
-$media = MediaFiles::query()->find(41);
+$media = MediaFiles::query()->find(2392);
 $result = $media->delete();
 
 $log = DB::getQueryLog();

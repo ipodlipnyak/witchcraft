@@ -72,16 +72,12 @@ class MediaFilesObserver
     public function deleting(MediaFiles $mediaFile)
     {
         // Deleting associated project if this media file is projects output
-        /*
-         * @TODO IMPORTANT! probably shouldn't do it.
-         * For example - it would be better to delete file without destroying project,
-         * in case i want to refresh media output for a project
-         */
         /* @var $project Projects */
-        // $project = $mediaFile->projectsOutput()->first();
-        // if ($project) {
-        // $project->delete();
-        // }
+        $project = $mediaFile->projectsOutput()->first();
+        if ($project) {
+            $project->delete();
+        }
+
         $mediaFile->deleteProjectsRelations()->deleteFiles();
     }
 
