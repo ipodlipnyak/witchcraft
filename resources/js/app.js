@@ -55,6 +55,15 @@ Vue.directive("press", {
 	}
 });
 
+Vue.directive("press-pan-pressup", {
+	bind: function(el, binding) {
+		if (typeof binding.value === "function") {
+			const mc = new Hammer(el);
+			mc.on("press pan pressup", binding.value);
+		}
+	}
+});
+
 Vue.directive("pressup", {
 	bind: function(el, binding) {
 		if (typeof binding.value === "function") {

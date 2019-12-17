@@ -1,5 +1,8 @@
 <template>
-<div class="fu-butt" v-pressup="stopCount" v-press="startCount">
+<div class="fu-butt" 
+	v-press-pan-pressup="stopCount"
+	v-pressup="stopCount" 
+	v-press="startCount">
 	<label><slot></slot></label>
 	<div ref="filler" class="fu-fill"></div>
 </div>
