@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
                 ->nullable()
                 ->default(null);
             $table->rememberToken();
+            $table->integer('storage_quota_bytes')->nullable();
             $table->timestamps();
         });
     }

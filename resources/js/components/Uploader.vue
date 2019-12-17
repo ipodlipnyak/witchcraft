@@ -3,6 +3,7 @@
 
 	<b-button-group size="bg" class="btn-block">
   		<file-upload
+  			v-if="quotaLeft > 0"
     		ref="upload"
     		v-model="files"
     		:post-action="uploadAction"
@@ -19,7 +20,7 @@
     
 		<b-button 
 			squared 
-			v-if="files.length > 0" 
+			v-if="files.length > 0 && totalFilesSizeToUpload <= quotaLeft"
 			v-show="!$refs.upload || !$refs.upload.active" 
 			@click.prevent="$refs.upload.active = true" 
 			variant="success">
@@ -37,6 +38,10 @@
 	</b-button-group>
 	
 	<b-table id="files-to-upload" v-if="files.length > 0" class="upload-tbl" :items="files" :fields="fields_files">
+		<template v-slot:head(size)="data">
+			Size {{ formatBytes(totalFilesSizeToUpload) }} / {{ formatBytes(quotaLeft) }}
+		</template>
+		
 		<template v-slot:cell(size)="data">
 			{{ formatBytes(data.value) }}
 		</template>
@@ -79,7 +84,7 @@
 		</template>
 		
 		<template v-slot:head(size)="data">
-			Size {{ formatBytes(totalFilesSize) }}
+			Size {{ formatBytes(quotaUsage) }} / {{ formatBytes(quotaMaximum) }}
 		</template>
 	</b-table>
         
@@ -162,6 +167,10 @@ Vue.use(ButtonGroupPlugin)
 		          ],
 		      uploaded_sortBy: 'label',
 		      uploaded_sortDesc: false,
+		      
+		      quotaMaximum: 0,
+		      quotaUsage: 0,
+		      quotaLeft: 0,
 		    }
 		},
 		computed: {
@@ -169,10 +178,10 @@ Vue.use(ButtonGroupPlugin)
 				return '/api/files/upload?api_token=' + this.apiToken;
 			},
 			
-			totalFilesSize: function() {
+			totalFilesSizeToUpload: function() {
 				let result = true;
 				
-				this.filesUploaded.forEach(function(file){
+				this.files.forEach(function(file){
 					result += file.size;
 				});
 				
@@ -230,6 +239,21 @@ Vue.use(ButtonGroupPlugin)
 		},
         
         methods: {
+        	getQuota: function() {
+        		self = this;
+        		axios.get('/api/user/quota?api_token=' + this.apiToken)
+        		  .then(function (response) {
+        			  if (response.data.status == 'success') {
+        				  self.quotaMaximum = response.data.maximum;
+        				  self.quotaUsage = response.data.usage;
+        				  self.quotaLeft = response.data.left;
+        			  }
+        		  })
+        		  .catch(function (error) {
+        		    console.log(error);
+        		  });
+        	},
+        	
         	deleteFile: function(id) {
         		self = this;
         		axios.delete('/api/files/' + id + '?api_token=' + this.apiToken)
@@ -256,6 +280,7 @@ Vue.use(ButtonGroupPlugin)
         		  .then(function (response) {
         			  if (response.data.status == 'success') {
         				  self.filesUploaded = response.data.files;
+        				  self.getQuota();
         			  }
         		  })
         		  .catch(function (error) {
