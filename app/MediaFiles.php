@@ -269,7 +269,7 @@ class MediaFiles extends Model
         if ($calculated_height != $compare_to_model->height) {
             return false;
         }
-        
+
         if ($force_same_scale && $match_width != $compare_to_model->width) {
             return false;
         }
@@ -278,7 +278,22 @@ class MediaFiles extends Model
     }
 
     /**
+     * Delete all projects relations
+     * 
+     * @return \App\MediaFiles
+     */
+    public function deleteProjectsRelations()
+    {
+        ProjectInputs::query()->where('media_file', $this->id)->delete();
+        
+        return $this;
+    }
+
+
+    /**
      * Delete thumbnail and media file from storage
+     * 
+     * @return \App\MediaFiles
      */
     public function deleteFiles()
     {
@@ -298,6 +313,8 @@ class MediaFiles extends Model
         if (Storage::disk($this->storage_disk)->exists("{$this->storage_path}/{$this->name}")) {
             Storage::disk($this->storage_disk)->delete("{$this->storage_path}/{$this->name}");
         }
+        
+        return $this;
     }
 
     /**

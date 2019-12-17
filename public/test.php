@@ -23,7 +23,6 @@ $app->make(Kernel::class)->bootstrap();
 /*
  * Test entry point. Should delete this entire file on prod
  */
-$container = Container::getInstance();
 DB::enableQueryLog();
 
 // $project = Projects::query()->find(3);
@@ -41,7 +40,10 @@ DB::enableQueryLog();
 // $result = $media->getStreams()->videos()->first()->all();
 // $media_model->refreshMediaData()->save();
 
-$result = MediaFiles::query()->where('upload_session', '<>', 2)->get();
+// $result = MediaFiles::query()->where('upload_session', '<>', 2)->get();
+
+$media = MediaFiles::query()->find(41);
+$result = $media->delete();
 
 $log = DB::getQueryLog();
 

@@ -235,10 +235,9 @@ class MediaController extends Controller
         ];
 
         $file_model = MediaFiles::query()->find(request('id'));
-        if (Storage::disk($file_model->storage_disk)->delete("{$file_model->storage_path}/{$file_model->name}")) {
-            if ($file_model->delete()) {
-                $result['status'] = 'success';
-            }
+        
+        if ($file_model->delete()) {
+            $result['status'] = 'success';
         }
 
         return response()->json($result);
