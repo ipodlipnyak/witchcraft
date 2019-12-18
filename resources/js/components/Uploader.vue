@@ -122,31 +122,6 @@ function pickHex(color1, color2, weight) {
     return rgb;
 };
 
-/*
-jQuery.expr.filters.offscreen = function(el) {
-	  var rect = el.getBoundingClientRect();
-	  return (
-	           (rect.x + rect.width) < 0 
-	             || (rect.y + rect.height) < 0
-	             || (rect.x > window.innerWidth || rect.y > window.innerHeight)
-	         );
-	};
-	
-window.checkOverflow = function (el)
-	{
-	   var curOverflow = el.style.overflow;
-
-	   if ( !curOverflow || curOverflow === "visible" )
-	      el.style.overflow = "hidden";
-
-	   var isOverflowing = el.clientWidth < el.scrollWidth 
-	      || el.clientHeight < el.scrollHeight;
-
-	   el.style.overflow = curOverflow;
-
-	   return isOverflowing;
-	}
-*/
 import FillUpButton from './FillUpButton';
 
 import FileUpload from 'vue-upload-component';
