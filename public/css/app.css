@@ -13531,6 +13531,10 @@ body {
     background: white;
   }
 
+  .upload-tbl tr:nth-child(1) td:nth-child(1) {
+    padding: 0;
+  }
+
   .upload-tbl tr:nth-of-type(2n+1) {
     background-color: rgba(0, 0, 0, 0.035);
   }
@@ -13619,6 +13623,10 @@ body {
 
   .upload-tbl {
     background: white;
+  }
+
+  .upload-tbl tr:nth-child(1) td:nth-child(1) {
+    padding: 0;
   }
 
   .upload-tbl tr:nth-of-type(2n+1) {

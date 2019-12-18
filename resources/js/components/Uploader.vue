@@ -38,8 +38,18 @@
 	</b-button-group>
 	
 	<b-table id="files-to-upload" v-if="files.length > 0" class="upload-tbl" :items="files" :fields="fields_files">
+	
+		<template v-slot:top-row="data">
+          		<b-td colspan="4">
+          			<b-progress :max="quotaLeft">
+      					<b-progress-bar :style="quotaProgressToUploadCssStyle" :value="totalFilesSizeToUpload" animated show-progress>{{ formatBytes(totalFilesSizeToUpload) }}</b-progress-bar>
+      					<b-progress-bar variant="info" :value="quotatoUploadLeft" striped show-progress>{{ formatBytes(quotatoUploadLeft) }}</b-progress-bar>
+    				</b-progress>
+          		</b-td>
+      	</template>
+      	
 		<template v-slot:head(size)="data">
-			Size {{ formatBytes(totalFilesSizeToUpload) }} / {{ formatBytes(quotaLeft) }}
+			Size
 		</template>
 		
 		<template v-slot:cell(size)="data">
@@ -51,9 +61,10 @@
 			<button v-else-if="data.item.progress == '0.00'" @click="removeFileFromUploadQuery(data.item)">
 			<font-awesome-icon icon="times-circle" :style="{ color: '#e2ae85' }" size="2x"/>
 			</button>
-			<b-progress v-else :value="Number(data.value)" show-progress animated></b-progress>
+			<b-progress variant="success" v-else :value="Number(data.value)" show-progress animated></b-progress>
 		</template>
 	</b-table>
+
 
 	<b-table
 		v-if="filesUploaded.length > 0" 
@@ -63,6 +74,15 @@
   		:fields="fields_uploaded"
 		:sort-by.sync="uploaded_sortBy"
       	:sort-desc.sync="uploaded_sortDesc">
+      	
+		<template v-slot:top-row="data">
+          		<b-td colspan="4">
+          			<b-progress :max="quotaMaximum">
+      					<b-progress-bar :style="quotaProgressUploadedCssStyle" :value="quotaUsage" animated show-progress>{{ formatBytes(quotaUsage) }}</b-progress-bar>
+      					<b-progress-bar variant="info" :value="quotaLeft" striped show-progress>{{ formatBytes(quotaLeft) }}</b-progress-bar>
+    				</b-progress>
+          		</b-td>
+      	</template>
       	
 		<template v-slot:cell(thumb)="data">
 			<a :href="'/storage/media/' + data.item.id">
@@ -84,7 +104,7 @@
 		</template>
 		
 		<template v-slot:head(size)="data">
-			Size {{ formatBytes(quotaUsage) }} / {{ formatBytes(quotaMaximum) }}
+			Size
 		</template>
 	</b-table>
         
@@ -93,6 +113,16 @@
 
 <script>
 
+function pickHex(color1, color2, weight) {
+    var w1 = weight;
+    var w2 = 1 - w1;
+    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
+        Math.round(color1[1] * w1 + color2[1] * w2),
+        Math.round(color1[2] * w1 + color2[2] * w2)];
+    return rgb;
+};
+
+/*
 jQuery.expr.filters.offscreen = function(el) {
 	  var rect = el.getBoundingClientRect();
 	  return (
@@ -116,7 +146,7 @@ window.checkOverflow = function (el)
 
 	   return isOverflowing;
 	}
-
+*/
 import FillUpButton from './FillUpButton';
 
 import FileUpload from 'vue-upload-component';
@@ -154,7 +184,7 @@ Vue.use(ButtonGroupPlugin)
 		    	  'name',
 // 		    	  'type',
 		    	  'size',
-		    	  'progress'
+		    	  { key: 'progress', label: '', sortable: false }
 		    	  ],
 		      
 		      filesUploaded: [],
@@ -171,9 +201,40 @@ Vue.use(ButtonGroupPlugin)
 		      quotaMaximum: 0,
 		      quotaUsage: 0,
 		      quotaLeft: 0,
+		      
+		      quotaColorGradient: {
+		    	  min: [56,193,114],
+		    	  max: [227,52,47],
+		      },
+		      
+		      classObject: {
+		    	    active: true,
+		    	    'text-danger': false
+				}
+		      
 		    }
 		},
 		computed: {
+			quotatoUploadLeft: function() {
+				return this.quotaLeft >= this.totalFilesSizeToUpload ? this.quotaLeft - this.totalFilesSizeToUpload : 0; 
+			},
+			
+			quotaProgressToUploadCssStyle: function() {
+				let weight = this.quotaLeft >= this.totalFilesSizeToUpload ? this.totalFilesSizeToUpload / this.quotaLeft : 1;
+				let color = pickHex(this.quotaColorGradient.max, this.quotaColorGradient.min, weight);
+				return {
+					backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+				};
+			},
+			
+			quotaProgressUploadedCssStyle: function() {
+				let weight = this.quotaMaximum >= this.quotaUsage ? this.quotaUsage / this.quotaMaximum : 1;
+				let color = pickHex(this.quotaColorGradient.max, this.quotaColorGradient.min, weight);
+				return {
+					backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+				};
+			},
+			
 			uploadAction: function () {
 				return '/api/files/upload?api_token=' + this.apiToken;
 			},
@@ -345,5 +406,8 @@ Vue.use(ButtonGroupPlugin)
 </script>
 
 <style scoped lang='scss'>
-
+.progress {
+	border-radius: 0;
+	height: 1.5rem;
+}
 </style>
