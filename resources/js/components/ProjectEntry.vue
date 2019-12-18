@@ -7,7 +7,7 @@
                         v-if="projectEntry.status == 4"
                         preload="none" 
                         :poster="'/storage/thumbs/' + project.output.id + '/original'"
-                        :id="'player-' + project.id" 
+                        :id="'player-' + project.id"
                         width="100%" 
                         controls>
                 <source :src="'/storage/media/' + project.output.id" :type="projectEntry.mime_type" />
@@ -109,7 +109,7 @@ export default {
 	
 	methods: {
 		deleteProject: function() {
-			self = this;
+			var self = this;
 			
     		axios.delete('/api/projects/' + self.project.id + '?api_token=' + self.apiToken)
     		.then(function (response) {
@@ -127,7 +127,7 @@ export default {
 			}
 		},
 		refreshProjectData: function() {
-			self = this;
+			var self = this;
 			
     		axios.get('/api/projects/' + self.project.id + '/?api_token=' + self.apiToken)
     		.then(function (response) {
@@ -140,7 +140,7 @@ export default {
     		});
 		},
 		startProject: function() {
-			self = this;
+			var self = this;
 			
     		axios.post('/api/projects/' + self.project.id + '/start?api_token=' + self.apiToken, {
     			inputs: self.inputOrder
@@ -155,7 +155,7 @@ export default {
     		});
 		},
 		stopProject: function() {
-			self = this;
+			var self = this;
 			
     		axios.post('/api/projects/' + self.project.id + '/stop?api_token=' + self.apiToken, {
     			inputs: self.inputOrder
