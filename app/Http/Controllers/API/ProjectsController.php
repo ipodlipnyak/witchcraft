@@ -44,16 +44,9 @@ class ProjectsController extends Controller
         $project = new Projects();
         $project->save();
 
-        $output = new MediaFiles();
-
-        $user_id = Auth::user()->id;
-        $suffix = Str::random(5);
         $extension = $request->get('extension');
-        $output->name = "{$user_id}_{$project->id}_{$suffix}.{$extension}";
 
-        $output->storage_path = env('FFMPEG_OUTPUT_FOLDER');
-        $output->storage_disk = env('FFMPEG_DISK');
-        $output->user = $user_id;
+        $output = MediaFiles::createOutputTemplate($extension);
         $output->width = $request->get('width');
         $output->height = $request->get('height');
         $output->label = $request->get('label');

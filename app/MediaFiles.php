@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use FFMpeg\Filters\Frame\FrameFilters;
 use Illuminate\Support\Facades\Log;
 use FFMpeg\Media\Video;
+use Illuminate\Support\Facades\Schema;
 
 class MediaFiles extends Model
 {
@@ -43,6 +44,11 @@ class MediaFiles extends Model
         return $file_model;
     }
 
+    /**
+     *
+     * @param Media $media
+     * @return \App\MediaFiles
+     */
     static function createFromMedia(Media $media)
     {
         /* @var $stream Stream */
@@ -84,6 +90,28 @@ class MediaFiles extends Model
         }
 
         $file_model->save();
+        return $file_model;
+    }
+
+    /**
+     * Create output model template
+     *
+     * @param string $extension
+     * @param int $user_id
+     * @return MediaFiles
+     */
+    static function createOutputTemplate(string $extension = 'mp4', $user_id = null): MediaFiles
+    {
+        $user_id = $user_id ?: Auth::user()->id;
+
+        $suffix = Str::random(5);
+
+        $file_model = new MediaFiles();
+        $file_model->user = $user_id;
+        $file_model->name = "{$user_id}_{$suffix}.{$extension}";
+        $file_model->storage_path = env('FFMPEG_OUTPUT_FOLDER');
+        $file_model->storage_disk = env('FFMPEG_DISK');
+
         return $file_model;
     }
 
@@ -184,7 +212,7 @@ class MediaFiles extends Model
             return $file->getExtension();
         }
 
-        return null;
+        return pathinfo($this->name, PATHINFO_EXTENSION) ?: null;
     }
 
     /**
@@ -373,7 +401,7 @@ class MediaFiles extends Model
         /* @var $thumb_source MediaFiles */
         if ($this->projectsOutput()
             ->get()
-            ->isNotEmpty()) {
+            ->isNotEmpty() && $this->projectsOutput()->value('status') != ProjectStatuses::DONE) {
             /* @var $project Projects */
             $project = $this->projectsOutput()->first();
             $thumb_source = $project->getFirstInput();

@@ -18,10 +18,9 @@ use FFMpeg\Format\Video\X264;
 use Illuminate\Database\Eloquent\Collection;
 use App\ProjectInputs;
 use FFMpeg\Media\Video;
-use FFMpeg\Media\AbstractStreamableMedia;
 use App\Events\ProjectUpdate;
 use Illuminate\Support\Facades\Log;
-use FFMpeg\Exception\RuntimeException;
+use FFMpeg\Exception\RuntimeException as FFMpegRuntimeException;
 
 class MergeMedia implements ShouldQueue
 {
@@ -95,7 +94,7 @@ class MergeMedia implements ShouldQueue
             $input_model = $inputs_list->first();
             try {
                 $this->convertMedia($input_model, $task);
-            } catch (RuntimeException $e) {
+            } catch (FFMpegRuntimeException $e) {
                 Log::info($e->getMessage());
                 return false;
             }
@@ -107,7 +106,7 @@ class MergeMedia implements ShouldQueue
              */
             try {
                 $this->concatenate($inputs_list, $task);
-            } catch (RuntimeException $e) {
+            } catch (FFMpegRuntimeException $e) {
                 Log::info($e->getMessage());
                 return false;
             }
@@ -129,21 +128,36 @@ class MergeMedia implements ShouldQueue
     }
 
     /**
-     * Simple ffmpegs convertion with resize filter
+     * Simple ffmpegs convertion with resize filter and progress counter
      *
      * @param MediaFiles $input_model
      * @param Projects $task
+     * @param MediaFiles $output_model
+     *            if not set output model will be tacken from task
      */
-    protected function convertMedia(MediaFiles $input_model, Projects $task)
+    protected function convertMedia(MediaFiles $input_model, Projects $task, $output_model = null)
     {
-        $output_model = $task->output()->first();
+        if (! $output_model) {
+            $output_model = $task->output()->first();
+        }
+
+        $count_inputs = $task->inputs()
+            ->get()
+            ->count();
+        $input_priority = (int) ProjectInputs::query()->where('project', $task->id)
+            ->where('media_file', $input_model->id)
+            ->value('priority');
+
+        $progress_step = 1 / $count_inputs;
+        $progress_offset = $progress_step * $input_priority * 100;
+
         $input_media = $input_model->getMedia();
         $output_model->deleteFiles();
 
         $format = new X264();
         $format->setAudioCodec('libmp3lame');
-        $format->on('progress', function ($video, $format, $percentage) use ($task) {
-            $this->makeProgress($percentage, $task);
+        $format->on('progress', function ($video, $format, $percentage) use ($task, $progress_offset, $progress_step) {
+            $this->makeProgress($progress_offset + $percentage * $progress_step, $task);
         });
 
         $input_media->addFilter(function (VideoFilters $filters) use ($output_model) {
@@ -167,13 +181,7 @@ class MergeMedia implements ShouldQueue
         $output_model = $task->output()->first();
         $output_model->deleteFiles();
 
-        $sources = [];
-        /* @var $input_model MediaFiles */
-        foreach ($inputs_list as $input_model) {
-            array_push($sources, $input_model->getFullPath());
-        }
-
-        if (count($sources) > 0) {
+        if ($inputs_list->count() > 0) {
             /* @var $first_input_model MediaFiles */
             $first_input_model = ProjectInputs::query()->where('project', $task->id)
                 ->where('priority', 0)
@@ -193,16 +201,73 @@ class MergeMedia implements ShouldQueue
              * and concatenation tasks wouldn't take much time
              */
             if ($task->isInputsFromDifferentCodecs()) {
-                $format = new X264();
-                $format->setAudioCodec('libmp3lame');
-                $format->on('progress', function ($video, $format, $percentage) use ($task) {
-                    $this->makeProgress($percentage, $task);
-                });
-                $first_input_media->concat($sources)->saveFromDifferentCodecs($format, $output_model->getFullPath());
+                $this->convertAllInputs($task);
+                $inputs_list = $task->inputs()->get();
+
+                $this->concatSameCodecs($inputs_list, $output_model, $first_input_media);
+
+                foreach ($inputs_list as $media_model) {
+                    $media_model->delete();
+                }
             } else {
-                $first_input_media->concat($sources)->saveFromSameCodecs($output_model->getFullPath());
+                $this->concatSameCodecs($inputs_list, $output_model, $first_input_media);
             }
         }
+    }
+
+    protected function concatSameCodecs($inputs_list, $output_model, $first_input_media)
+    {
+        $sources = [];
+        /* @var $input_model MediaFiles */
+        foreach ($inputs_list as $input_model) {
+            array_push($sources, $input_model->getFullPath());
+        }
+        
+        $first_input_media->concat($sources)->saveFromSameCodecs($output_model->getFullPath());
+    }
+
+    protected function concatDifferentCodecs($inputs_list, $output_model, $first_input_media)
+    {
+        $sources = [];
+        /* @var $input_model MediaFiles */
+        foreach ($inputs_list as $input_model) {
+            array_push($sources, $input_model->getFullPath());
+        }
+        
+        $format = new X264();
+        $format->setAudioCodec('libmp3lame');
+        $first_input_media->concat($sources)->saveFromDifferentCodecs($format, $output_model->getFullPath());
+    }
+
+    protected function convertAllInputs(Projects $task)
+    {
+        $format = new X264();
+        $format->setAudioCodec('libmp3lame');
+
+        $inputs_list = $task->inputs()->get();
+
+        /* @var $task_output_model MediaFiles */
+        $task_output_model = $task->output()->first();
+        $extension = $task_output_model->getFileExtension();
+
+        foreach ($inputs_list as $input_media_model) {
+            /* @var $input_media_model MediaFiles */
+            $output_media_model = MediaFiles::createOutputTemplate($extension, $input_media_model->user);
+            $output_media_model->width = $task_output_model->width;
+            $output_media_model->height = $task_output_model->height;
+
+            $this->convertMedia($input_media_model, $task, $output_media_model);
+
+            $output_media_model->refreshMediaData()->save();
+
+            $project_input_model = ProjectInputs::query()->where('project', $task->id)
+                ->where('media_file', $input_media_model->id)
+                ->first();
+            $project_input_model->media_file = $output_media_model->id;
+            $project_input_model->save();
+        }
+
+        $task->consistencyCheck();
     }
 
     /**

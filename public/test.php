@@ -17,6 +17,7 @@ use App\Events\FFmpegProgress;
 use Illuminate\Broadcasting\PendingBroadcast;
 use App\Events\ProjectUpdate;
 use App\User;
+use Illuminate\Support\Facades\Schema;
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
@@ -47,9 +48,9 @@ DB::enableQueryLog();
 // $result = $media->delete();
 
 /* @var $user User */
-$user = User::query()->first();
+// $user = User::query()->first();
 
-$result = $user->calcStorageQuota();
+// $result = MediaFiles::query()->find(1653)->delete();
 
 $log = DB::getQueryLog();
 
