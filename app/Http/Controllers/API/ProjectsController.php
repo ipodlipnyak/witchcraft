@@ -51,6 +51,8 @@ class ProjectsController extends Controller
         $output->height = $request->get('height');
         $output->label = $request->get('label');
 
+        $project->concat_fade_duration = $request->get('concat_fade_duration');
+        
         if ($output->save()) {
             $project->output = $output->id;
             $project->save();
@@ -240,6 +242,7 @@ class ProjectsController extends Controller
 
         /* @var $project Projects */
         $project = Projects::query()->find(request('id'));
+        $project->concat_fade_duration = request('concat_fade_duration');
         $output = $project->output()
             ->get()
             ->first();
@@ -266,7 +269,7 @@ class ProjectsController extends Controller
                 }
             }
 
-            if ($output->save()) {
+            if ($output->save() && $project->save()) {
                 $result['status'] = 'success';
             }
         }

@@ -6,16 +6,16 @@
 	<b-alert v-if="errorMessage" show variant="danger">{{ errorMessage }}</b-alert>
 	
 	<b-button-group  size="bg" class="btn-block">
-		<b-button squared @click="updateProject" variant="success" class="mb-4">Save</b-button>
-		<b-button squared @click="selectProject('')" variant="primary" class="mb-4">Close</b-button>
+		<b-button squared @click="updateProject" variant="success" class="mb-2">Save</b-button>
+		<b-button squared @click="selectProject('')" variant="primary" class="mb-2">Close</b-button>
     </b-button-group>
 </div>
 
 <!-- New project -->
 <div v-else-if="projectSelected === 0">
 	<b-button-group  size="bg" class="btn-block">
-		<b-button squared @click="saveProject" variant="success" class="mb-4">Save</b-button>
-		<b-button squared @click="selectProject('')" variant="primary" class="mb-4">Close</b-button>
+		<b-button squared @click="saveProject" variant="success" class="mb-2">Save</b-button>
+		<b-button squared @click="selectProject('')" variant="primary" class="mb-2">Close</b-button>
     </b-button-group>
 </div>
 
@@ -32,7 +32,11 @@
 		</b-input-group-append>
 	</b-input-group>
 	
-	<b-input-group size="md" prepend="Ratio" class="pt-4">
+	<b-input-group size="md" prepend="Fade duration">
+    	<b-form-input type="number" min="0" step="0.5" v-model="fadeDuration"></b-form-input>
+	</b-input-group>
+	
+	<b-input-group size="md" prepend="Ratio">
 		<b-form-input v-model="aspectWidth"></b-form-input>
 		<b-form-input v-model="aspectHeight"></b-form-input>
 		<template v-slot:append>
@@ -51,6 +55,7 @@
 	</b-input-group>
 	
 	<project-inputs ref="inputs" 
+		class="pt-2"
 		:api-token="apiToken" 
 		:project-id="projectSelected.id">
 	</project-inputs>
@@ -117,6 +122,7 @@ export default {
 			projectSelected: '',
 			outputLabel: '',
 			outputFileExtension: '',
+			fadeDuration: 0,
 			
 			fileExtensionsList: ['mp4', 'mkv', 'ogg'],
 			
@@ -203,6 +209,10 @@ export default {
 			return 'output';
 		},
 		
+		defaultFadeDuration() {
+			return 0;
+		},
+		
 		outputName() {
 			return this.outputLabel && this.outputFileExtension ? this.outputLabel + '.' + this.outputFileExtension : '';
 		},
@@ -232,6 +242,7 @@ export default {
 			
 			self.outputLabel = self.projectSelected.output ? self.projectSelected.output.label : self.defaultOutputName;
 			self.outputFileExtension = self.projectSelected.output ? self.projectSelected.output.name.split('.').pop() : self.defaultExtension;
+			self.fadeDuration = self.projectSelected.concat_fade_duration ? self.projectSelected.concat_fade_duration : self.defaultFadeDuration;
 			
 			if(self.projectSelected.output && self.projectSelected.output.width && self.projectSelected.output.height) {
 				self.aspectWidth = self.projectSelected.output.width;
@@ -250,6 +261,7 @@ export default {
 				extension: self.outputFileExtension,
 				width: self.aspectWidth,
 				height: self.aspectHeight,
+				concat_fade_duration: self.fadeDuration,
 			})
     		.then(function (response) {
     			if (response.data.status == 'success') {
@@ -272,6 +284,7 @@ export default {
 				extension: self.outputFileExtension,
 				width: self.aspectWidth,
 				height: self.aspectHeight,
+				concat_fade_duration: self.fadeDuration,
 			})
     		.then(function (response) {
     			if (response.data.status == 'error') {

@@ -164,10 +164,9 @@ class MergeMedia implements ShouldQueue
             $this->makeProgress($progress_offset + $percentage * $progress_step, $task);
         });
 
-        if ($task->concat_fade_duration > 0) {
-
-            $media_duration = $input_media->getDurationInMiliseconds();
-
+        $media_duration = $input_media->getDurationInMiliseconds();
+        // would not fade if media shorter then fade duration
+        if ($task->concat_fade_duration > 0 && $media_duration > $task->concat_fade_duration * 1000) {
             $fade_duration = round($task->concat_fade_duration / 2, 3);
             $in_fade_start = 0;
             $out_fade_start = round(($media_duration - $fade_duration * 1000) / 1000, 3);

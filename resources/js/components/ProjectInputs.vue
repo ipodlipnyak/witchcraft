@@ -1,9 +1,9 @@
 <template>
-<div class="pt-4">
+<div>
 	<simplebar class="bar" data-simplebar-auto-hide="false">
 	<div class="row">
   
-	<div class="col-6">
+	<div class="col-6 pr-1">
 		<div class="card">
 			<div class="card-header">
 			Inputs
@@ -53,7 +53,7 @@
 		</div>
 
 	</div>
-	<div class="col-6">
+	<div class="col-6 pl-1">
 		<div class="card">
 			<div class="card-header">
 			Uploaded files

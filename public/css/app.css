@@ -13692,7 +13692,8 @@ body {
 
 .input-group .input-group-text,
 .input-group .input-group-append,
-.btn {
+.btn,
+.form-control {
   border-radius: 0;
 }
 
