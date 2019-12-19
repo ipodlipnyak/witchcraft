@@ -48,6 +48,47 @@ class Projects extends Model
             return false;
         }
     }
+    
+    /**
+     * Find out if inputs are with the same or compatable ratio and size
+     *
+     * @return bool
+     */
+    public function isInputsHaveSameRatio(): bool
+    {
+        $this->consistencyCheck();
+        
+        $input_list = ProjectInputs::query()->where('project', $this->id)->get();
+        if (count($input_list) > 1) {
+            return $input_list->where('status', InputStatuses::WRONG_RATIO)->isNotEmpty();
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Find out if task should apply filters
+     *
+     * @return bool
+     */
+    public function isTaskShouldApplyFilters(): bool
+    {
+        $this->consistencyCheck();
+
+        if ($this->concat_fade_duration > 0) {
+            return true;
+        }
+        
+        if (! $this->isInputsHaveSameRatio()) {
+            return true;
+        }
+        
+        if ($this->isInputsFromDifferentCodecs()) {
+            return true;
+        }
+        
+        return false;
+    }
 
     /**
      * Check if every project inputs coherent with each other

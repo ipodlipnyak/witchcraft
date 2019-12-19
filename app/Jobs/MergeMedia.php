@@ -21,6 +21,9 @@ use FFMpeg\Media\Video;
 use App\Events\ProjectUpdate;
 use Illuminate\Support\Facades\Log;
 use FFMpeg\Exception\RuntimeException as FFMpegRuntimeException;
+use FFMpeg\Filters\Audio\AudioFilters;
+use FFMpeg\Filters\Audio\CustomFilter as AudioCustomFilter;
+use FFMpeg\Filters\Video\CustomFilter as VideoCustomFilter;
 
 class MergeMedia implements ShouldQueue
 {
@@ -151,6 +154,7 @@ class MergeMedia implements ShouldQueue
         $progress_step = 1 / $count_inputs;
         $progress_offset = $progress_step * $input_priority * 100;
 
+        /* @var $input_media Video */
         $input_media = $input_model->getMedia();
         $output_model->deleteFiles();
 
@@ -159,6 +163,29 @@ class MergeMedia implements ShouldQueue
         $format->on('progress', function ($video, $format, $percentage) use ($task, $progress_offset, $progress_step) {
             $this->makeProgress($progress_offset + $percentage * $progress_step, $task);
         });
+
+        if ($task->concat_fade_duration > 0) {
+
+            $media_duration = $input_media->getDurationInMiliseconds();
+
+            $fade_duration = round($task->concat_fade_duration / 2, 3);
+            $in_fade_start = 0;
+            $out_fade_start = round(($media_duration - $fade_duration * 1000) / 1000, 3);
+
+            if ($input_priority > 0) {
+                $input_media->addFilter(function (VideoFilters $filters) use ($fade_duration, $in_fade_start) {
+                    $filters->custom("fade=type=in:st={$in_fade_start}:d={$fade_duration}");
+                });
+                $input_media->addFilter(new AudioCustomFilter("afade=type=in:st={$in_fade_start}:d={$fade_duration}"));
+            }
+
+            if ($input_priority + 1 < $count_inputs) {
+                $input_media->addFilter(function (VideoFilters $filters) use ($fade_duration, $out_fade_start) {
+                    $filters->custom("fade=type=out:st={$out_fade_start}:d={$fade_duration}");
+                });
+                $input_media->addFilter(new AudioCustomFilter("afade=type=out:st={$out_fade_start}:d={$fade_duration}"));
+            }
+        }
 
         $input_media->addFilter(function (VideoFilters $filters) use ($output_model) {
             $filters->resize(new Dimension($output_model->width, $output_model->height));
@@ -200,7 +227,7 @@ class MergeMedia implements ShouldQueue
              * In that case it would be possible to check the progress,
              * and concatenation tasks wouldn't take much time
              */
-            if ($task->isInputsFromDifferentCodecs()) {
+            if ($task->isTaskShouldApplyFilters()) {
                 $this->convertAllInputs($task);
                 $inputs_list = $task->inputs()->get();
 
@@ -222,7 +249,7 @@ class MergeMedia implements ShouldQueue
         foreach ($inputs_list as $input_model) {
             array_push($sources, $input_model->getFullPath());
         }
-        
+
         $first_input_media->concat($sources)->saveFromSameCodecs($output_model->getFullPath());
     }
 
@@ -233,7 +260,7 @@ class MergeMedia implements ShouldQueue
         foreach ($inputs_list as $input_model) {
             array_push($sources, $input_model->getFullPath());
         }
-        
+
         $format = new X264();
         $format->setAudioCodec('libmp3lame');
         $first_input_media->concat($sources)->saveFromDifferentCodecs($format, $output_model->getFullPath());
