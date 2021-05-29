@@ -40,6 +40,6 @@
         "vue-upload-component": "^2.8.20",
         "vue-video": "^0.1.7",
         "vuedraggable": "^2.23.2",
-        "ws": "^7.2.0"
+        "ws": "^7.4.6"
     }
 }
