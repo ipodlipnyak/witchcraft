@@ -34,7 +34,7 @@
         "hammerjs": "^2.0.8",
         "laravel-echo": "^1.6.1",
         "simplebar-vue": "^1.3.7",
-        "socket.io": "^2.3.0",
+        "socket.io": "^2.5.0",
         "socket.io-client": "^2.3.0",
         "vue-masonry-css": "^1.0.3",
         "vue-upload-component": "^2.8.20",
